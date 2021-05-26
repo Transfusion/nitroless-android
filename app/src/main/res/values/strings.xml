@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Nitroless</string>
+    <string name="title_home">Home</string>
+    <string name="title_sources">Sources</string>
+    <string name="title_notifications">Notifications</string>
+
+    <string name="action_add_repo">Add Repository</string>
+    <string name="action_sources_refresh">Refresh</string>
+    <string name="add_repo_dialog_title">Add Repo</string>
+    <string name="add_nitroless_url">Add Nitroless URL</string>
+    <string name="sample_nitroless_repo_url">https://nitroless.github.io/ExampleNitrolessRepo/</string>
+</resources>
