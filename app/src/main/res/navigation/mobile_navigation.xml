@@ -15,7 +15,24 @@
         android:id="@+id/navigation_sources"
         android:name="io.github.transfusion.nitroless.ui.sources.SourcesFragment"
         android:label="@string/title_sources"
-        tools:layout="@layout/fragment_sources" />
+        tools:layout="@layout/fragment_sources" >
+        <action
+            android:id="@+id/action_navigation_sources_to_navigation_single_source"
+            app:destination="@id/navigation_single_source"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@anim/fragment_fade_enter"
+            app:popExitAnim="@anim/fragment_fade_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_single_source"
+        android:name="io.github.transfusion.nitroless.SingleSourceFragment"
+        tools:layout="@layout/fragment_single_source">
+        <argument
+            android:name="NitrolessRepoId"
+            app:argType="integer" />
+    </fragment>
 
 <!--    <fragment-->
 <!--        android:id="@+id/navigation_notifications"-->

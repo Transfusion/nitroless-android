@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NitrolessRepoDao {
+    @Query("SELECT * FROM nitrolessrepo WHERE id = :id")
+    fun getRepoById(id: Int): Flow<NitrolessRepo>
+
     @Query("SELECT * FROM nitrolessrepo")
     fun getAll(): Flow<List<NitrolessRepo>>
 

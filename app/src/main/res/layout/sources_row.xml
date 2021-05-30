@@ -19,6 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="5dp"
+        android:onClick="@{clickListener}"
         app:cardCornerRadius="5dp">
 
         <LinearLayout
@@ -32,7 +33,6 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:onClick="@{clickListener}"
                 app:imageUrl="@{repo.url + `/RepoImage.png`}"
                 app:shapeAppearanceOverlay="@style/SourcesImage" />
 

@@ -4,11 +4,13 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.databinding.BindingAdapter
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
 import io.github.transfusion.nitroless.databinding.SourcesRowBinding
 import io.github.transfusion.nitroless.storage.NitrolessRepo
+import io.github.transfusion.nitroless.ui.sources.SourcesFragmentDirections
 
 class NitrolessRepoViewHolder(private val binding: SourcesRowBinding) :
     RecyclerView.ViewHolder(binding.root) {
@@ -16,6 +18,16 @@ class NitrolessRepoViewHolder(private val binding: SourcesRowBinding) :
     init {
         binding.setClickListener {
             Log.d(javaClass.name, "clicked on ${binding.repo}")
+
+            binding.repo?.id?.let { id ->
+                val direction =
+                    SourcesFragmentDirections.actionNavigationSourcesToNavigationSingleSource(
+                        id
+                    )
+
+                it.findNavController().navigate(direction)
+            }
+
         }
     }
 
