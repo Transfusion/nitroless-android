@@ -5,20 +5,22 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import androidx.recyclerview.widget.RecyclerView
-import io.github.transfusion.nitroless.adapters.EmoteCellAdapter
+import androidx.recyclerview.widget.SimpleItemAnimator
+import io.github.transfusion.nitroless.adapters.SingleSourceAdapter
 import io.github.transfusion.nitroless.databinding.FragmentSingleSourceBinding
 import io.github.transfusion.nitroless.util.GridAutofitLayoutManager
 import io.github.transfusion.nitroless.util.GridSpacingItemDecoration
 import io.github.transfusion.nitroless.util.clearDecorations
 
-class SingleSourceFragment : Fragment() {
+class SingleSourceFragment : Fragment(),
+    SearchView.OnQueryTextListener {
 
     companion object {
         fun newInstance() = SingleSourceFragment()
@@ -28,12 +30,15 @@ class SingleSourceFragment : Fragment() {
         SingleSourceViewModelFactory((activity?.application as NitrolessApplication).repository)
     }*/
 
+    private var mSearchQuery: String? = null
     private val viewModel: SingleSourceViewModel by viewModels {
         SingleSourceViewModelFactory(
             requireArguments().getInt("NitrolessRepoId"),
             (requireActivity().application as NitrolessApplication).repository
         )
     }
+
+    private var singleSourceAdapter: SingleSourceAdapter? = null
 
     private var _binding: FragmentSingleSourceBinding? = null
 
@@ -50,6 +55,10 @@ class SingleSourceFragment : Fragment() {
 //            viewModel
         }
 
+        if (savedInstanceState != null) {
+            mSearchQuery = savedInstanceState.getString("searchQuery");
+        }
+
 
         super.onCreate(savedInstanceState)
     }
@@ -62,9 +71,12 @@ class SingleSourceFragment : Fragment() {
         _binding = FragmentSingleSourceBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+//        (binding.emotesRecyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations =
+//            false
+        // https://stackoverflow.com/questions/42379660/how-to-prevent-recyclerview-item-from-blinking-after-notifyitemchangedpos
+        binding.emotesRecyclerView.itemAnimator = null
         val layoutManager = GridAutofitLayoutManager(requireContext(), 150)
         binding.emotesRecyclerView.layoutManager = layoutManager
-
         binding.emotesRecyclerView.clearDecorations()
         binding.emotesRecyclerView.addItemDecoration(
             GridSpacingItemDecoration(
@@ -79,8 +91,12 @@ class SingleSourceFragment : Fragment() {
         viewModel.currentRepo.observe(viewLifecycleOwner) { repo ->
             Log.d(javaClass.name, "Observed!! $repo")
             binding.collapsingToolbarLayout.title = repo.name
-            val emoteCellAdapter = EmoteCellAdapter(repo.url)
-            subscribeEmoteCellAdapter(emoteCellAdapter)
+            singleSourceAdapter = SingleSourceAdapter(repo.url)
+            subscribeSingleSourceAdapter(singleSourceAdapter!!)
+
+            if (mSearchQuery != null) {
+                this.onQueryTextChange(mSearchQuery)
+            }
         }
 
         viewModel.status.observe(viewLifecycleOwner) { status ->
@@ -95,11 +111,14 @@ class SingleSourceFragment : Fragment() {
             }
         }
 
+        // bind SearchView
+        binding.emoteSearch.setOnQueryTextListener(this)
+
 //        return inflater.inflate(R.layout.fragment_single_source, container, false)
         return root
     }
 
-    private fun subscribeEmoteCellAdapter(adapter: EmoteCellAdapter) {
+    private fun subscribeSingleSourceAdapter(adapter: SingleSourceAdapter) {
         viewModel.emotes.observe(viewLifecycleOwner) {
             Log.d("emotes changed", it.emotes.toString())
             adapter.path = it.path
@@ -132,5 +151,22 @@ class SingleSourceFragment : Fragment() {
             false
         }*/
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("searchQuery", mSearchQuery);
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        this.onQueryTextChange(query)
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        mSearchQuery = newText
+        singleSourceAdapter?.filter?.filter(newText);
+        return false
+    }
+
 
 }

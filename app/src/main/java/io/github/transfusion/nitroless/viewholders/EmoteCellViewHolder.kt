@@ -5,6 +5,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
+import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
 import io.github.transfusion.nitroless.databinding.EmoteCellBinding
 import java.net.URI
@@ -44,7 +45,8 @@ class EmoteCellViewHolder(private val binding: EmoteCellBinding) :
             val url = newUri.normalize().toURL().toString()
 
             if (!url.isNullOrEmpty())
-                Glide.with(view.context).load(url).into(view)
+                Glide.with(view.context).load(url)
+                    .error(R.drawable.ic_baseline_help_outline_24).into(view)
         }
     }
 
