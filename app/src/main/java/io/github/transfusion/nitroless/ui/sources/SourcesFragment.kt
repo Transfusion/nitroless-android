@@ -94,7 +94,7 @@ class SourcesFragment : Fragment() {
 //                , R.id.navigation_notifications
             )
         )
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
+        val toolbar = binding.toolbar
         toolbar.setupWithNavController(navController, appBarConfiguration)
         toolbar.inflateMenu(R.menu.sources_toolbar_menu)
         toolbar.setOnMenuItemClickListener { it ->
