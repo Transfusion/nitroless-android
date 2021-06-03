@@ -40,6 +40,23 @@ android {
 }
 
 dependencies {
+    def latestFastAdapterRelease = "5.4.1"
+    implementation "com.mikepenz:fastadapter-extensions-binding:${latestFastAdapterRelease}" // view binding helpers
+    implementation "com.mikepenz:fastadapter:${latestFastAdapterRelease}"
+    implementation "com.mikepenz:fastadapter-extensions-expandable:${latestFastAdapterRelease}"
+    implementation "com.mikepenz:fastadapter-extensions-utils:${latestFastAdapterRelease}" // needs the `expandable`, `drag` and `scroll` extension.
+    // For animated GIF support
+    implementation 'com.facebook.fresco:animated-gif:2.4.0'
+
+    // For WebP support, including animated WebP
+    implementation 'com.facebook.fresco:animated-webp:2.4.0'
+    implementation 'com.facebook.fresco:webpsupport:2.4.0'
+
+    // For WebP support, without animations
+    implementation 'com.facebook.fresco:webpsupport:2.4.0'
+
+    implementation 'com.facebook.fresco:fresco:2.4.0'
+
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     // Glide v4 uses this new annotation processor -- see https://bumptech.github.io/glide/doc/generatedapi.html

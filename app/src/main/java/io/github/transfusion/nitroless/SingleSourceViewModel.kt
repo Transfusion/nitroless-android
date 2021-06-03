@@ -3,14 +3,13 @@ package io.github.transfusion.nitroless
 import android.util.Log
 import androidx.lifecycle.*
 import io.github.transfusion.nitroless.data.NitrolessRepoModel
+import io.github.transfusion.nitroless.enums.LOADINGSTATUS
 import io.github.transfusion.nitroless.network.NitrolessRepoEndpoints
 import io.github.transfusion.nitroless.network.ServiceBuilder
 import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.storage.NitrolessRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-
-enum class LOADINGSTATUS { READY, LOADING, FAILED }
 
 class SingleSourceViewModel(private val repoId: Int, private val repository: NitrolessRepository) :
     ViewModel() {

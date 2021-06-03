@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto">
 
 
     <data>
@@ -27,13 +28,15 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
 
-        <com.google.android.material.imageview.ShapeableImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/emote_cell_padding">
+
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/emote_image"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="@dimen/emote_cell_side"
+            android:layout_height="@dimen/emote_cell_side"
             android:layout_gravity="center"
             android:onClick="@{clickListener}"
             app:baseUrl="@{baseUrl}"

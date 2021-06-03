@@ -9,10 +9,10 @@ class HomeHeaderViewHolder(private val binding: HomeRecyclerviewSourceHeaderBind
 
 
     fun bind(_repo: NitrolessRepo) {
-        binding.apply {
+        /*binding.apply {
             repo = _repo
             executePendingBindings()
-        }
+        }*/
     }
 
 

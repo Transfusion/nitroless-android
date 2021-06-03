@@ -2,17 +2,22 @@ package io.github.transfusion.nitroless.ui.home
 
 import android.util.Log
 import androidx.lifecycle.*
-import io.github.transfusion.nitroless.LOADINGSTATUS
-import io.github.transfusion.nitroless.adapters.NitroLessRepoAndModel
+import io.github.transfusion.nitroless.enums.LOADINGSTATUS
+import io.github.transfusion.nitroless.data.NitrolessRepoModel
 import io.github.transfusion.nitroless.network.NitrolessRepoEndpoints
 import io.github.transfusion.nitroless.network.ServiceBuilder
+import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.storage.NitrolessRepository
 import io.github.transfusion.nitroless.util.pmap
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+// combination of NitrolessRepo and NitrolessRepoModel
+data class NitroLessRepoAndModel(
+    val nitrolessRepo: NitrolessRepo,
+    val nitrolessRepoModel: NitrolessRepoModel?
+)
 
-enum class LOADINGSTATUS { READY, LOADING, FAILED }
 class HomeViewModel(private val repository: NitrolessRepository) : ViewModel() {
 
     private var _status = MutableLiveData(LOADINGSTATUS.READY)
@@ -44,7 +49,7 @@ class HomeViewModel(private val repository: NitrolessRepository) : ViewModel() {
         }
     }
 
-    private suspend fun loadNitroLessRepoAndModels() {
+    /*private suspend fun loadNitroLessRepoAndModels() {
         _status.value = LOADINGSTATUS.LOADING
         // for each repository, get the emotes list
         try {
@@ -60,7 +65,28 @@ class HomeViewModel(private val repository: NitrolessRepository) : ViewModel() {
             Log.d(javaClass.name, e.toString())
             _status.value = LOADINGSTATUS.FAILED
         }
+    }*/
+
+    private suspend fun loadNitroLessRepoAndModels() {
+        _status.value = LOADINGSTATUS.LOADING
+        // for each repository, get the emotes list
+        val repoAndModels = repository.repos.first().pmap {
+            val serviceBuilder = ServiceBuilder(it.url)
+            val request = serviceBuilder.buildService(NitrolessRepoEndpoints::class.java)
+
+            var indexResponse: NitrolessRepoModel? = null
+            try {
+                indexResponse = request.getIndex()
+            } catch (e: Exception) {
+                Log.d(javaClass.name, e.toString())
+            }
+            NitroLessRepoAndModel(nitrolessRepo = it, nitrolessRepoModel = indexResponse)
+        }
+        _nitrolessRepoAndModels.value = repoAndModels
+        _status.value = LOADINGSTATUS.READY
+
     }
+
 }
 
 

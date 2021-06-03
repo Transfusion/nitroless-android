@@ -1,9 +1,14 @@
 package io.github.transfusion.nitroless.viewholders
 
+import android.net.Uri
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.drawee.view.SimpleDraweeView
+import com.facebook.imagepipeline.request.ImageRequest
 import com.google.android.material.imageview.ShapeableImageView
 import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
@@ -33,7 +38,7 @@ class EmoteCellViewHolder(private val binding: EmoteCellBinding) :
         @JvmStatic
         @BindingAdapter(value = ["bind:baseUrl", "bind:path", "bind:imageUrl"])
         fun loadImage(
-            view: ShapeableImageView,
+            view: SimpleDraweeView,
             baseUrl: String?,
             path: String?,
             imageUrl: String?
@@ -44,9 +49,21 @@ class EmoteCellViewHolder(private val binding: EmoteCellBinding) :
             val newUri = uri.resolve(newPath)
             val url = newUri.normalize().toURL().toString()
 
-            if (!url.isNullOrEmpty())
-                Glide.with(view.context).load(url)
-                    .error(R.drawable.ic_baseline_help_outline_24).into(view)
+            if (!url.isNullOrEmpty()) {
+                view.hierarchy.setFailureImage(
+                    ContextCompat.getDrawable(
+                        view.context,
+                        R.drawable.ic_baseline_help_outline_24
+                    )
+                )
+                view.controller = Fresco.newDraweeControllerBuilder()
+                    .setImageRequest(ImageRequest.fromUri(url))
+                    .setAutoPlayAnimations(true)
+                    .build();
+            }
+
+//                Glide.with(view.context).load(url)
+//                    .error(R.drawable.ic_baseline_help_outline_24).into(view)
         }
     }
 

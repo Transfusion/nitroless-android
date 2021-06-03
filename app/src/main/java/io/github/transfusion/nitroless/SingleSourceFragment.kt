@@ -12,9 +12,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import androidx.recyclerview.widget.SimpleItemAnimator
 import io.github.transfusion.nitroless.adapters.SingleSourceAdapter
 import io.github.transfusion.nitroless.databinding.FragmentSingleSourceBinding
+import io.github.transfusion.nitroless.enums.LOADINGSTATUS
 import io.github.transfusion.nitroless.util.GridAutofitLayoutManager
 import io.github.transfusion.nitroless.util.GridSpacingItemDecoration
 import io.github.transfusion.nitroless.util.clearDecorations
