@@ -107,7 +107,7 @@ class HomeFragment : Fragment() {
             for (nitrolessRepoAndModel in it) {
 //                if (nitrolessRepoAndModel.nitrolessRepoModel == null) continue
                 val homeExpandableHeaderItem =
-                    HomeExpandableHeaderItem(nitrolessRepoAndModel.nitrolessRepo.name)
+                    HomeExpandableHeaderItem(nitrolessRepoAndModel.nitrolessRepo)
 
                 if (nitrolessRepoAndModel.nitrolessRepoModel != null) {
                     val emotes = ArrayList<BindingEmoteCellItem>()
