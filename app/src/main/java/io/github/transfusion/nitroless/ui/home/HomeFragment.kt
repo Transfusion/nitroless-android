@@ -65,12 +65,9 @@ class HomeFragment : Fragment() {
 
         val emoteCellSide = resources.getDimension(R.dimen.emote_cell_side)
         val emoteCellPadding = resources.getDimension(R.dimen.emote_cell_padding)
-
         val totalEmoteCellWidth = emoteCellSide + emoteCellPadding * 2
-
         Log.d(javaClass.name, "width of screen $screenWidth")
         Log.d(javaClass.name, "side of emote cell $emoteCellSide")
-
         val noOfSpans = (screenWidth / totalEmoteCellWidth).toInt()
         Log.d(javaClass.name, "calculated spans $noOfSpans")
 
@@ -84,6 +81,7 @@ class HomeFragment : Fragment() {
             override fun getSpanSize(position: Int): Int {
                 return when (fastItemAdapter.getItemViewType(position)) {
                     ITEM_VIEW_TYPE_EMOTE_ITEM -> 1
+                    ITEM_VIEW_TYPE_MESSAGE_ITEM -> noOfSpans
                     ITEM_VIEW_TYPE_HEADER -> noOfSpans
                     else -> -1
                 }
@@ -107,20 +105,28 @@ class HomeFragment : Fragment() {
         homeViewModel.nitrolessRepoAndModels.observe(viewLifecycleOwner) {
             val items = ArrayList<HomeExpandableHeaderItem>(it.size)
             for (nitrolessRepoAndModel in it) {
-                if (nitrolessRepoAndModel.nitrolessRepoModel == null) continue
+//                if (nitrolessRepoAndModel.nitrolessRepoModel == null) continue
                 val homeExpandableHeaderItem =
                     HomeExpandableHeaderItem(nitrolessRepoAndModel.nitrolessRepo.name)
-                val emotes = ArrayList<BindingEmoteCellItem>()
-                for (emote in nitrolessRepoAndModel.nitrolessRepoModel.emotes) {
-                    val bindingEmoteCellItem =
-                        BindingEmoteCellItem(
-                            nitrolessRepoAndModel.nitrolessRepo.url,
-                            nitrolessRepoAndModel.nitrolessRepoModel.path,
-                            emote
-                        )
-                    emotes.add(bindingEmoteCellItem)
+
+                if (nitrolessRepoAndModel.nitrolessRepoModel != null) {
+                    val emotes = ArrayList<BindingEmoteCellItem>()
+                    for (emote in nitrolessRepoAndModel.nitrolessRepoModel.emotes) {
+                        val bindingEmoteCellItem =
+                            BindingEmoteCellItem(
+                                nitrolessRepoAndModel.nitrolessRepo.url,
+                                nitrolessRepoAndModel.nitrolessRepoModel.path,
+                                emote
+                            )
+                        emotes.add(bindingEmoteCellItem)
+                    }
+                    homeExpandableHeaderItem.subItems.addAll(emotes)
+                } else {
+                    val msg = BindingMessageItem(R.string.repo_fetch_error)
+                    homeExpandableHeaderItem.subItems.add(msg)
                 }
-                homeExpandableHeaderItem.subItems.addAll(emotes)
+
+
                 items.add(homeExpandableHeaderItem)
             }
             adapter.setNewList(items)

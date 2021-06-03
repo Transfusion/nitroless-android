@@ -10,4 +10,6 @@
     <string name="add_nitroless_url">Add Nitroless URL</string>
     <string name="sample_nitroless_repo_url">https://nitroless.github.io/ExampleNitrolessRepo/</string>
     <string name="emote_name">Emote Name</string>
+
+    <string name="repo_fetch_error">Could not fetch emotes.</string>
 </resources>

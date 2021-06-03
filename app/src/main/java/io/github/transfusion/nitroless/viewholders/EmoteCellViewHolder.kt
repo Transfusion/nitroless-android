@@ -33,7 +33,8 @@ class EmoteCellViewHolder(private val binding: EmoteCellBinding) :
         }
     }
 
-
+    // this also applies to BindingEmoteCellItem.kt! it manages its
+    // own ViewHolder
     companion object {
         @JvmStatic
         @BindingAdapter(value = ["bind:baseUrl", "bind:path", "bind:imageUrl"])
