@@ -22,6 +22,7 @@ import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
 //import io.github.transfusion.nitroless.adapters.HomeSectionedAdapter
 import io.github.transfusion.nitroless.databinding.FragmentHomeBinding
+import io.github.transfusion.nitroless.enums.LOADINGSTATUS
 import io.github.transfusion.nitroless.ui.home.expandable.HomeExpandableHeaderItem
 
 
@@ -60,6 +61,18 @@ class HomeFragment : Fragment() {
         /*homeViewModel.text.observe(viewLifecycleOwner, Observer {
             textView.text = it
         })*/
+
+        homeViewModel.status.observe(viewLifecycleOwner) { status ->
+            when (status) {
+                LOADINGSTATUS.LOADING -> {
+                    binding.progressBarVisible = true
+                }
+                else -> {
+                    binding.progressBarVisible = false
+                }
+            }
+        }
+
 
         val screenWidth = requireContext().resources.displayMetrics.widthPixels
 

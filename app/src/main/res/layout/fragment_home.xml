@@ -82,7 +82,7 @@
                 app:layout_anchorGravity="bottom|center"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/emote_search" />
+                app:layout_constraintTop_toBottomOf="@id/emote_search" />
 
             <!--            56dp is the height of the BottomNavigationView -->
             <androidx.recyclerview.widget.RecyclerView
