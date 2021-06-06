@@ -318,7 +318,9 @@ public class CustomItemTouchHelper extends RecyclerView.ItemDecoration
     private ItemTouchHelperGestureListener mItemTouchHelperGestureListener;
 
     float mDownX;
+    float mRawDownX;
     float mDownY;
+    float mRawDownY;
 
     private final RecyclerView.OnItemTouchListener mOnItemTouchListener = new RecyclerView.OnItemTouchListener() {
         private boolean onClick;
@@ -336,7 +338,9 @@ public class CustomItemTouchHelper extends RecyclerView.ItemDecoration
                 mInitialTouchY = event.getY();
                 //记录ACTION_DOWN的位置
                 mDownX = event.getX();
+                mRawDownX = event.getRawX();
                 mDownY = event.getY();
+                mRawDownY = event.getRawY();
                 onClick = true;
 
                 obtainVelocityTracker();
@@ -467,7 +471,7 @@ public class CustomItemTouchHelper extends RecyclerView.ItemDecoration
             if (onClick && mSelected != null) {//抬起时，调用点击
                 View view = mSelected.itemView;
                 if (view instanceof ViewGroup) {
-                    view = findView((ViewGroup) mSelected.itemView, event.getRawX(), event.getRawY());
+                    view = findView((ViewGroup) mSelected.itemView, mRawDownX, mRawDownY);
                 }
 
                 if (view != null) {
