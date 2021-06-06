@@ -1,8 +1,12 @@
 package io.github.transfusion.nitroless.viewholders
 
+import android.annotation.SuppressLint
 import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.view.GestureDetectorCompat
 import androidx.databinding.BindingAdapter
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -12,24 +16,39 @@ import io.github.transfusion.nitroless.databinding.SourcesRowBinding
 import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.ui.sources.SourcesFragmentDirections
 
+@SuppressLint("ClickableViewAccessibility")
 class NitrolessRepoViewHolder(val binding: SourcesRowBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
-    public var swipedOpen = false
+    var swipedOpen = false
+    private var mDetector: GestureDetectorCompat
 
-    init {
-        binding.setClickListener {
-            Log.d(javaClass.name, "clicked on ${binding.repo}")
+    private class MyGestureListener(val binding: SourcesRowBinding) :
+        GestureDetector.SimpleOnGestureListener() {
 
+        override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
             binding.repo?.id?.let { id ->
                 val direction =
                     SourcesFragmentDirections.actionNavigationSourcesToNavigationSingleSource(
                         id
                     )
-
-                it.findNavController().navigate(direction)
+                binding.actualSourceItem.findNavController().navigate(direction)
             }
+            return super.onSingleTapConfirmed(e)
+        }
 
+    }
+
+
+    init {
+        binding.tvRemove.setOnClickListener {
+            // TODO: Implement removing a source
+        }
+
+        mDetector =
+            GestureDetectorCompat(binding.actualSourceItem.context, MyGestureListener(binding))
+        binding.actualSourceItem.setOnTouchListener { v, event ->
+            return@setOnTouchListener mDetector.onTouchEvent(event)
         }
     }
 

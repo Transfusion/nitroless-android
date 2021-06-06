@@ -1,6 +1,8 @@
 package io.github.transfusion.nitroless.util
 
 import android.content.res.Resources
+import android.graphics.Rect
+import android.view.View
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope

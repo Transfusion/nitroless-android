@@ -68,6 +68,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?attr/searchViewBackgroundColor"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:padding="5dp">
@@ -77,7 +79,6 @@
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_gravity="center"
-                    android:onClick="@{clickListener}"
                     app:imageUrl="@{repo.url + `/RepoImage.png`}"
                     app:shapeAppearanceOverlay="@style/SourcesImage" />
 

@@ -30,6 +30,7 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.animation.Interpolator;
 
@@ -147,7 +148,7 @@ public class CustomItemTouchHelper extends RecyclerView.ItemDecoration
 
     private static final String TAG = "ItemTouchHelper";
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final int ACTIVE_POINTER_ID_NONE = -1;
 
@@ -316,10 +317,14 @@ public class CustomItemTouchHelper extends RecyclerView.ItemDecoration
      */
     private ItemTouchHelperGestureListener mItemTouchHelperGestureListener;
 
-    private final OnItemTouchListener mOnItemTouchListener = new OnItemTouchListener() {
+    float mDownX;
+    float mDownY;
+
+    private final RecyclerView.OnItemTouchListener mOnItemTouchListener = new RecyclerView.OnItemTouchListener() {
+        private boolean onClick;
+
         @Override
-        public boolean onInterceptTouchEvent(@NonNull RecyclerView recyclerView,
-                                             @NonNull MotionEvent event) {
+        public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent event) {
             mGestureDetector.onTouchEvent(event);
             if (DEBUG) {
                 Log.d(TAG, "intercept: x:" + event.getX() + ",y:" + event.getY() + ", " + event);
@@ -329,6 +334,11 @@ public class CustomItemTouchHelper extends RecyclerView.ItemDecoration
                 mActivePointerId = event.getPointerId(0);
                 mInitialTouchX = event.getX();
                 mInitialTouchY = event.getY();
+                //记录ACTION_DOWN的位置
+                mDownX = event.getX();
+                mDownY = event.getY();
+                onClick = true;
+
                 obtainVelocityTracker();
                 if (mSelected == null) {
                     final RecoverAnimation animation = findAnimation(event);
@@ -345,6 +355,10 @@ public class CustomItemTouchHelper extends RecyclerView.ItemDecoration
                 }
             } else if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
                 mActivePointerId = ACTIVE_POINTER_ID_NONE;
+                if (action == MotionEvent.ACTION_UP) {
+                    //点击事件
+                    click(event);
+                }
                 select(null, ACTION_STATE_IDLE);
             } else if (mActivePointerId != ACTIVE_POINTER_ID_NONE) {
                 // in a non scroll orientation, if distance change is above threshold, we
@@ -357,6 +371,21 @@ public class CustomItemTouchHelper extends RecyclerView.ItemDecoration
                     checkSelectForSwipe(action, event, index);
                 }
             }
+
+            //处理下move事件
+            if (action == MotionEvent.ACTION_MOVE) {
+                //移动了，就解除点击
+                final float dx = event.getX(mActivePointerId) - mDownX;
+                final float dy = event.getY(mActivePointerId) - mDownY;
+                final float absDx = Math.abs(dx);
+                final float absDy = Math.abs(dy);
+
+                if (absDx > mSlop || absDy > mSlop) {
+                    onClick = false;
+                }
+            }
+
+
             if (mVelocityTracker != null) {
                 mVelocityTracker.addMovement(event);
             }
@@ -364,7 +393,7 @@ public class CustomItemTouchHelper extends RecyclerView.ItemDecoration
         }
 
         @Override
-        public void onTouchEvent(@NonNull RecyclerView recyclerView, @NonNull MotionEvent event) {
+        public void onTouchEvent(RecyclerView recyclerView, MotionEvent event) {
             mGestureDetector.onTouchEvent(event);
             if (DEBUG) {
                 Log.d(TAG,
@@ -403,10 +432,13 @@ public class CustomItemTouchHelper extends RecyclerView.ItemDecoration
                     }
                     // fall through
                 case MotionEvent.ACTION_UP:
+                    //点击事件
+                    click(event);
                     select(null, ACTION_STATE_IDLE);
                     mActivePointerId = ACTIVE_POINTER_ID_NONE;
                     break;
                 case MotionEvent.ACTION_POINTER_UP: {
+                    onClick = false;
                     final int pointerIndex = event.getActionIndex();
                     final int pointerId = event.getPointerId(pointerIndex);
                     if (pointerId == mActivePointerId) {
@@ -418,7 +450,84 @@ public class CustomItemTouchHelper extends RecyclerView.ItemDecoration
                     }
                     break;
                 }
+                case MotionEvent.ACTION_DOWN: {
+                    break;
+                }
+                default:
+                    onClick = false;
+                    break;
             }
+        }
+
+        /**
+         * 点击事件处理
+         * @param event
+         */
+        private void click(MotionEvent event) {
+            if (onClick && mSelected != null) {//抬起时，调用点击
+                View view = mSelected.itemView;
+                if (view instanceof ViewGroup) {
+                    view = findView((ViewGroup) mSelected.itemView, event.getRawX(), event.getRawY());
+                }
+
+                if (view != null) {
+                    view.performClick();
+                }
+            }
+            onClick = false;
+        }
+
+        /**
+         * 找到被点击的View
+         *
+         * @param parent
+         * @param x
+         * @param y
+         * @return
+         */
+        private View findView(ViewGroup parent, float x, float y) {
+            int count = parent.getChildCount();
+            for (int i = 0; i < count; i++) {
+                View view = parent.getChildAt(i);
+                //如果是组件，并可见的话
+                if (view instanceof ViewGroup && view.getVisibility() == View.VISIBLE) {
+                    //递归调用
+                    View child = findView((ViewGroup) view, x, y);
+                    if (child != null) {
+                        return child;
+                    }
+                }
+
+                //如果在可点击区域内，又是控件的话
+                if (isInRegion(view, x, y) && view.getVisibility() == View.VISIBLE) {
+                    return view;
+                }
+            }
+
+            //没有child的情况，判断下有没有在可点击区域内
+            if (isInRegion(parent, x, y) && parent.getVisibility() == View.VISIBLE) {
+                return parent;
+            }
+
+            return null;
+        }
+
+        /**
+         * 判断点击位置是否在区域内
+         * @param child
+         * @param x
+         * @param y
+         * @return
+         */
+        private boolean isInRegion(View child, float x, float y) {
+            Rect rect = new Rect();
+            //获取在屏幕全局的区域
+            child.getGlobalVisibleRect(rect);
+            if (rect.contains((int) x, (int) y) && ViewCompat.hasOnClickListeners(child) &&
+                    child.getVisibility() == View.VISIBLE) {
+                return true;
+            }
+            return false;
         }
 
         @Override
