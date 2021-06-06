@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import io.github.transfusion.nitroless.adapters.SingleSourceAdapter
 import io.github.transfusion.nitroless.databinding.FragmentSingleSourceBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
@@ -75,9 +76,24 @@ class SingleSourceFragment : Fragment(),
 //            false
         // https://stackoverflow.com/questions/42379660/how-to-prevent-recyclerview-item-from-blinking-after-notifyitemchangedpos
         binding.emotesRecyclerView.itemAnimator = null
-        val layoutManager = GridAutofitLayoutManager(requireContext(), 150)
+
+        val screenWidth = requireContext().resources.displayMetrics.widthPixels
+
+        val emoteCellSide = resources.getDimension(R.dimen.emote_cell_side)
+        val emoteCellPadding = resources.getDimension(R.dimen.emote_cell_padding)
+        val totalEmoteCellWidth = emoteCellSide + emoteCellPadding * 2
+        Log.d(javaClass.name, "width of screen $screenWidth")
+        Log.d(javaClass.name, "side of emote cell $emoteCellSide")
+        val noOfSpans = (screenWidth / totalEmoteCellWidth).toInt()
+        Log.d(javaClass.name, "calculated spans $noOfSpans")
+
+
+
+        val layoutManager = GridLayoutManager(requireContext(), noOfSpans)
+
+//        val layoutManager = GridAutofitLayoutManager(requireContext(), 150)
         binding.emotesRecyclerView.layoutManager = layoutManager
-        binding.emotesRecyclerView.clearDecorations()
+        /*binding.emotesRecyclerView.clearDecorations()
         binding.emotesRecyclerView.addItemDecoration(
             GridSpacingItemDecoration(
                 layoutManager.spanCount,
@@ -86,10 +102,9 @@ class SingleSourceFragment : Fragment(),
                 0,
                 false
             )
-        )
+        )*/
 
         viewModel.currentRepo.observe(viewLifecycleOwner) { repo ->
-            Log.d(javaClass.name, "Observed!! $repo")
             binding.collapsingToolbarLayout.title = repo.name
             singleSourceAdapter = SingleSourceAdapter(repo.url)
             subscribeSingleSourceAdapter(singleSourceAdapter!!)
