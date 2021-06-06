@@ -8,7 +8,7 @@ import io.github.transfusion.nitroless.databinding.SourcesRowBinding
 import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.viewholders.NitrolessRepoViewHolder
 
-class NitrolessRepoAdapter :
+class NitrolessRepoAdapter(private val deleteFunction: (NitrolessRepo) -> Unit) :
     ListAdapter<NitrolessRepo, NitrolessRepoViewHolder>(NitrolessRepoDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NitrolessRepoViewHolder {
@@ -17,7 +17,7 @@ class NitrolessRepoAdapter :
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ), deleteFunction
         )
     }
 

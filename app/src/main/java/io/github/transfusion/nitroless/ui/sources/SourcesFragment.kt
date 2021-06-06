@@ -69,12 +69,14 @@ class SourcesFragment : Fragment() {
             textView.text = it
         })*/
 
-        val nitrolessRepoAdapter = NitrolessRepoAdapter()
+        // passing repository in is needed to handle deletes
+        val nitrolessRepoAdapter = NitrolessRepoAdapter { repo ->
+            sourcesViewModel.removeRepo(repo)
+        }
 //        binding.sourcesRecyclerView.adapter = nitrolessRepoAdapter
         subscribeNitrolessRepoAdapter(nitrolessRepoAdapter)
 
 
-        // todo: add swipe listeners here
         val itemTouchHelperCallback = ItemTouchHelperCallback()
 //        itemTouchHelperCallback.setiMoveAndSwipeCallback(this)
         itemTouchHelper = CustomItemTouchHelper(itemTouchHelperCallback)

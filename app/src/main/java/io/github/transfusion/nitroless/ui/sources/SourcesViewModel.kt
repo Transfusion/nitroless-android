@@ -13,6 +13,10 @@ class SourcesViewModel(private val repository: NitrolessRepository) : ViewModel(
         repository.insert(repo)
     }
 
+    fun removeRepo(repo: NitrolessRepo) = viewModelScope.launch {
+        repository.removeRepo(repo)
+    }
+
 
     private val _text = MutableLiveData<String>().apply {
         value = "This is dashboard Fragment"

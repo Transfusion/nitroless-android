@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
-import android.view.View
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.GestureDetectorCompat
 import androidx.databinding.BindingAdapter
 import androidx.navigation.findNavController
@@ -17,7 +15,10 @@ import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.ui.sources.SourcesFragmentDirections
 
 @SuppressLint("ClickableViewAccessibility")
-class NitrolessRepoViewHolder(val binding: SourcesRowBinding) :
+class NitrolessRepoViewHolder(
+    val binding: SourcesRowBinding,
+    deleteFunction: (NitrolessRepo) -> Unit
+) :
     RecyclerView.ViewHolder(binding.root) {
 
     var swipedOpen = false
@@ -42,7 +43,8 @@ class NitrolessRepoViewHolder(val binding: SourcesRowBinding) :
 
     init {
         binding.tvRemove.setOnClickListener {
-            // TODO: Implement removing a source
+            Log.d(javaClass.name, "REMOVING JANCOK")
+            deleteFunction(binding.repo!!)
         }
 
         mDetector =
