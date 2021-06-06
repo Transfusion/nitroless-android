@@ -39,7 +39,7 @@ class EmoteCellViewHolder(private val binding: EmoteCellBinding) :
         @JvmStatic
         @BindingAdapter(value = ["bind:baseUrl", "bind:path", "bind:imageUrl"])
         fun loadImage(
-            view: SimpleDraweeView,
+            view: ShapeableImageView,
             baseUrl: String?,
             path: String?,
             imageUrl: String?
@@ -51,7 +51,7 @@ class EmoteCellViewHolder(private val binding: EmoteCellBinding) :
             val url = newUri.normalize().toURL().toString()
 
             if (!url.isNullOrEmpty()) {
-                view.hierarchy.setFailureImage(
+                /*view.hierarchy.setFailureImage(
                     ContextCompat.getDrawable(
                         view.context,
                         R.drawable.ic_baseline_help_outline_24
@@ -60,11 +60,12 @@ class EmoteCellViewHolder(private val binding: EmoteCellBinding) :
                 view.controller = Fresco.newDraweeControllerBuilder()
                     .setImageRequest(ImageRequest.fromUri(url))
                     .setAutoPlayAnimations(true)
-                    .build();
+                    .build();*/
+
+                Glide.with(view.context).load(url)
+                    .error(R.drawable.ic_baseline_help_outline_24).into(view)
             }
 
-//                Glide.with(view.context).load(url)
-//                    .error(R.drawable.ic_baseline_help_outline_24).into(view)
         }
     }
 

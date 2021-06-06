@@ -12,10 +12,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.URLUtil
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
@@ -23,6 +21,8 @@ import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.databinding.FragmentSourcesBinding
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import io.github.transfusion.nitroless.AlertDialogFragment
 import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.adapters.NitrolessRepoAdapter
@@ -33,6 +33,7 @@ import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.ui.AddNitrolessUrlFragment
 
 import io.github.transfusion.nitroless.ui.YesNoDialogFragment
+import io.github.transfusion.nitroless.viewholders.NitrolessRepoViewHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.Exception
@@ -50,6 +51,8 @@ class SourcesFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private lateinit var itemTouchHelper: CustomItemTouchHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,6 +72,16 @@ class SourcesFragment : Fragment() {
         val nitrolessRepoAdapter = NitrolessRepoAdapter()
 //        binding.sourcesRecyclerView.adapter = nitrolessRepoAdapter
         subscribeNitrolessRepoAdapter(nitrolessRepoAdapter)
+
+
+        // todo: add swipe listeners here
+        val itemTouchHelperCallback = ItemTouchHelperCallback()
+//        itemTouchHelperCallback.setiMoveAndSwipeCallback(this)
+        itemTouchHelper = CustomItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(binding.sourcesRecyclerView)
+
+        itemTouchHelperCallback.itemTouchHelper = itemTouchHelper
+
         return root
     }
 
@@ -228,4 +241,5 @@ class SourcesFragment : Fragment() {
         dialog.arguments = args
         fragmentManager?.let { dialog.show(it, "tag") }
     }
+
 }

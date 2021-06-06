@@ -12,8 +12,10 @@ import io.github.transfusion.nitroless.databinding.SourcesRowBinding
 import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.ui.sources.SourcesFragmentDirections
 
-class NitrolessRepoViewHolder(private val binding: SourcesRowBinding) :
+class NitrolessRepoViewHolder(val binding: SourcesRowBinding) :
     RecyclerView.ViewHolder(binding.root) {
+
+    public var swipedOpen = false
 
     init {
         binding.setClickListener {
