@@ -104,6 +104,10 @@ class SingleSourceFragment : Fragment(),
                 LOADINGSTATUS.LOADING -> {
                     binding.progressBarVisible = true
                 }
+                LOADINGSTATUS.FAILED -> {
+                    binding.progressBarVisible = false
+                    binding.errorMessageVisible = true
+                }
                 else -> {
                     Log.d(javaClass.name, "Setting progress bar visible to FALSE")
                     binding.progressBarVisible = false

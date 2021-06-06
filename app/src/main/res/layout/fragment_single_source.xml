@@ -8,6 +8,10 @@
         <import type="android.view.View" />
 
         <variable
+            name="errorMessageVisible"
+            type="java.lang.Boolean" />
+
+        <variable
             name="progressBarVisible"
             type="java.lang.Boolean" />
     </data>
@@ -87,6 +91,21 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/emote_search" />
+
+            <TextView
+                android:id="@+id/home_source_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="8dp"
+                android:text="@string/repo_fetch_error"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="15sp"
+                android:visibility="@{errorMessageVisible ? View.VISIBLE : View.GONE, default=gone}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/emotes_recycler_view"
