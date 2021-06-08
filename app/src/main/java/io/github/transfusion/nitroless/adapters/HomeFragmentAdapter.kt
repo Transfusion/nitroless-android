@@ -93,7 +93,12 @@ class HomeFragmentAdapter : Filterable, ListAdapter<DataItem, RecyclerView.ViewH
         // ListAdapter should call it for us!!
         val result: MutableList<DataItem> = ArrayList()
         for (dataItem in currentBackingDataItems!!) {
-            if (dataItem.type == ITEM_VIEW_TYPE_EMOTE_ITEM) {
+            if (dataItem.type == ITEM_VIEW_TYPE_HEADER) {
+                val casted =
+                    (dataItem as DataItem.HeaderItem).copy() // lmao, DiffUtil checks identity.
+                casted.expanded = expandedMap[casted.groupIndex] == true
+                result.add(casted)
+            } else if (dataItem.type == ITEM_VIEW_TYPE_EMOTE_ITEM) {
                 val casted = dataItem as DataItem.EmoteItem
                 if (expandedMap[casted.nitrolessRepo.id] == true) result.add(dataItem)
             } else {
@@ -147,7 +152,7 @@ class HomeFragmentAdapter : Filterable, ListAdapter<DataItem, RecyclerView.ViewH
         when (holder) {
             is HomeHeaderViewHolder -> {
                 val item = getItem(position) as DataItem.HeaderItem
-                holder.bind(item.nitrolessRepo) {
+                holder.bind(item.nitrolessRepo, item.expanded) {
                     onHomeHeaderViewClicked(item)
                 }
             }

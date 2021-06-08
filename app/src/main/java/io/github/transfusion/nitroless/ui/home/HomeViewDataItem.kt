@@ -17,11 +17,13 @@ sealed class DataItem {
     ) : DataItem() {
         override val type = ITEM_VIEW_TYPE_HEADER
 
+        var expanded = true
+
         override fun equals(other: Any?): Boolean {
 //            return super.equals(other)
             if (other !is HeaderItem) return false
             val castedOther = other as HeaderItem
-            return castedOther.nitrolessRepo == other.nitrolessRepo &&
+            return castedOther.nitrolessRepo == nitrolessRepo && castedOther.expanded == expanded &&
                     id == castedOther.id
         }
     }

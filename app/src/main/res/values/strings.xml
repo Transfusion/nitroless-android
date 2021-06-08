@@ -12,4 +12,5 @@
     <string name="emote_name">Emote Name</string>
 
     <string name="repo_fetch_error">Could not fetch emotes.</string>
+    <string name="expand_section">Expand Section</string>
 </resources>
