@@ -5,6 +5,10 @@
     <data>
 
         <variable
+            name="clickListener"
+            type="android.view.View.OnClickListener" />
+
+        <variable
             name="repo"
             type="io.github.transfusion.nitroless.storage.NitrolessRepo" />
     </data>
@@ -14,6 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:gravity="center_vertical"
+        android:onClick="@{clickListener}"
         android:orientation="horizontal"
         android:padding="5dp">
 

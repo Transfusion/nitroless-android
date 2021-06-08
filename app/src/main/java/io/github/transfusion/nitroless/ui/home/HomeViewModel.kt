@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 // combination of NitrolessRepo and NitrolessRepoModel
-data class NitroLessRepoAndModel(
+data class NitrolessRepoAndModel(
     val nitrolessRepo: NitrolessRepo,
     val nitrolessRepoModel: NitrolessRepoModel?
 )
@@ -24,10 +24,10 @@ class HomeViewModel(private val repository: NitrolessRepository) : ViewModel() {
     val status: LiveData<LOADINGSTATUS> = _status
 
     //    val repos: LiveData<List<NitrolessRepo>> = repository.repos.asLiveData()
-    private val _nitrolessRepoAndModels: MutableLiveData<List<NitroLessRepoAndModel>> =
+    private val _nitrolessRepoAndModels: MutableLiveData<List<NitrolessRepoAndModel>> =
         MutableLiveData()
 
-    val nitrolessRepoAndModels: LiveData<List<NitroLessRepoAndModel>> = _nitrolessRepoAndModels
+    val nitrolessRepoAndModels: LiveData<List<NitrolessRepoAndModel>> = _nitrolessRepoAndModels
     /*val nitrolessRepoAndModels = repository.repos.map { repo ->
         repo.pmap {
             val serviceBuilder = ServiceBuilder(it.url)
@@ -80,7 +80,7 @@ class HomeViewModel(private val repository: NitrolessRepository) : ViewModel() {
             } catch (e: Exception) {
                 Log.d(javaClass.name, e.toString())
             }
-            NitroLessRepoAndModel(nitrolessRepo = it, nitrolessRepoModel = indexResponse)
+            NitrolessRepoAndModel(nitrolessRepo = it, nitrolessRepoModel = indexResponse)
         }
         _nitrolessRepoAndModels.value = repoAndModels
         _status.value = LOADINGSTATUS.READY

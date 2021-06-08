@@ -7,12 +7,14 @@ import io.github.transfusion.nitroless.storage.NitrolessRepo
 class HomeHeaderViewHolder(private val binding: HomeRecyclerviewSourceHeaderBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
-
-    fun bind(_repo: NitrolessRepo) {
-        /*binding.apply {
+    fun bind(_repo: NitrolessRepo, function: () -> Unit) {
+        binding.apply {
             repo = _repo
             executePendingBindings()
-        }*/
+        }
+        binding.setClickListener {
+            function()
+        }
     }
 
 

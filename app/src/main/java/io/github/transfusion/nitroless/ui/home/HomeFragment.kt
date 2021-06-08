@@ -1,5 +1,6 @@
 package io.github.transfusion.nitroless.ui.home
 
+//import io.github.transfusion.nitroless.adapters.HomeSectionedAdapter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,28 +12,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.mikepenz.fastadapter.GenericItem
-import com.mikepenz.fastadapter.IExpandable
-import com.mikepenz.fastadapter.IItem
-import com.mikepenz.fastadapter.adapters.FastItemAdapter
-import com.mikepenz.fastadapter.adapters.GenericFastItemAdapter
-import com.mikepenz.fastadapter.expandable.ExpandableExtension
-import com.mikepenz.fastadapter.expandable.getExpandableExtension
 import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
-//import io.github.transfusion.nitroless.adapters.HomeSectionedAdapter
+import io.github.transfusion.nitroless.adapters.HomeFragmentAdapter
 import io.github.transfusion.nitroless.databinding.FragmentHomeBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
-import io.github.transfusion.nitroless.ui.home.expandable.HomeExpandableHeaderItem
 
-
-const val ITEM_VIEW_TYPE_HEADER = 10010
-const val ITEM_VIEW_TYPE_EMOTE_ITEM = 10011
-const val ITEM_VIEW_TYPE_MESSAGE_ITEM = 10012 // e.g. "repo failed to load"
 
 class HomeFragment : Fragment() {
 
-    private lateinit var fastItemAdapter: GenericFastItemAdapter
+    private lateinit var homeFragmentAdapter: HomeFragmentAdapter
 
     private val homeViewModel: HomeViewModel by viewModels {
         HomeViewModelFactory((activity?.application as NitrolessApplication).repository)
@@ -85,14 +74,12 @@ class HomeFragment : Fragment() {
         Log.d(javaClass.name, "calculated spans $noOfSpans")
 
 
-        fastItemAdapter = FastItemAdapter()
-
-        // enable expandables
-        val expandableExtension = fastItemAdapter.getExpandableExtension()
+        homeFragmentAdapter = HomeFragmentAdapter()
+        
         val gridLayoutManager = GridLayoutManager(requireContext(), noOfSpans)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when (fastItemAdapter.getItemViewType(position)) {
+                return when (homeFragmentAdapter.getItemViewType(position)) {
                     ITEM_VIEW_TYPE_EMOTE_ITEM -> 1
                     ITEM_VIEW_TYPE_MESSAGE_ITEM -> noOfSpans
                     ITEM_VIEW_TYPE_HEADER -> noOfSpans
@@ -102,72 +89,17 @@ class HomeFragment : Fragment() {
         }
 
         binding.homeRecyclerView.layoutManager = gridLayoutManager
-//        binding.homeRecyclerView.itemAnimator = SlideDownAlphaAnimator()
-//        binding.homeRecyclerView.adapter = fastItemAdapter
 
-        subscribeHomeSectionedAdapter(expandableExtension, fastItemAdapter)
-
+        subscribeHomeFragmentAdapter(homeFragmentAdapter)
 
         return root
     }
 
-    private fun subscribeHomeSectionedAdapter(
-        expandableExtension: ExpandableExtension<GenericItem>,
-        adapter: GenericFastItemAdapter
-    ) {
+    private fun subscribeHomeFragmentAdapter(adapter: HomeFragmentAdapter) {
         homeViewModel.nitrolessRepoAndModels.observe(viewLifecycleOwner) {
-            val items = ArrayList<HomeExpandableHeaderItem>(it.size)
-            for (nitrolessRepoAndModel in it) {
-//                if (nitrolessRepoAndModel.nitrolessRepoModel == null) continue
-                val homeExpandableHeaderItem =
-                    HomeExpandableHeaderItem(nitrolessRepoAndModel.nitrolessRepo)
-
-                if (nitrolessRepoAndModel.nitrolessRepoModel != null) {
-                    val emotes = ArrayList<BindingEmoteCellItem>()
-                    for (emote in nitrolessRepoAndModel.nitrolessRepoModel.emotes) {
-                        val bindingEmoteCellItem =
-                            BindingEmoteCellItem(
-                                nitrolessRepoAndModel.nitrolessRepo.url,
-                                nitrolessRepoAndModel.nitrolessRepoModel.path,
-                                emote
-                            )
-                        emotes.add(bindingEmoteCellItem)
-                    }
-                    homeExpandableHeaderItem.subItems.addAll(emotes)
-                } else {
-                    val msg = BindingMessageItem(R.string.repo_fetch_error)
-                    homeExpandableHeaderItem.subItems.add(msg)
-                }
-
-
-                items.add(homeExpandableHeaderItem)
-            }
-            adapter.setNewList(items)
-            expandableExtension.withSavedInstanceState(getAllExpandableIdsBundle(items, ""), "")
+            adapter.massageDataAndSubmitList(it)
         }
         binding.homeRecyclerView.adapter = adapter
-    }
-
-    // https://github.com/mikepenz/FastAdapter/issues/502
-    private fun getAllExpandableIdsBundle(
-        items: List<IItem<*>>,
-        fastAdapterBundlePrefix: String
-    ): Bundle {
-        val ids = getAllExpandableIds(items)
-        return Bundle().apply {
-            putLongArray("bundle_expanded$fastAdapterBundlePrefix", ids.toLongArray())
-        }
-    }
-
-    private fun getAllExpandableIds(items: List<IItem<*>>?): ArrayList<Long> {
-        val ids = ArrayList<Long>()
-        items?.forEach {
-            if (it is IExpandable<*>) {
-                ids.add(it.identifier)
-                ids.addAll(getAllExpandableIds(it.subItems).toList())
-            }
-        }
-        return ids
     }
 
 
