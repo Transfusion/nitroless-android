@@ -19,18 +19,55 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class HomeFragmentAdapter : Filterable, ListAdapter<DataItem, RecyclerView.ViewHolder>(
     HomeSectionedDiffCallback()
 ) {
     override fun getFilter(): Filter {
-        TODO("Not yet implemented")
+        return object : Filter() {
+            override fun performFiltering(charSequence: CharSequence?): FilterResults {
+                val charString = charSequence.toString()
+                if (charString.isEmpty()) {
+                    currentFilteredBackingDataItems = currentBackingDataItems
+                } else {
+                    currentBackingDataItems?.let {
+                        val filteredList = arrayListOf<DataItem>()
+                        for (dataItem in currentBackingDataItems!!) {
+                            if (dataItem.type == ITEM_VIEW_TYPE_EMOTE_ITEM) {
+                                val casted = dataItem as DataItem.EmoteItem
+                                if (charString.toLowerCase(Locale.ENGLISH) in casted.emote.name.toLowerCase(
+                                        Locale.ENGLISH
+                                    )
+                                ) filteredList.add(dataItem)
+                            } else {
+                                filteredList.add(dataItem)
+                            }
+                        }
+                        currentFilteredBackingDataItems = filteredList
+                    }
+                }
+                val filterResults = FilterResults()
+                filterResults.values = currentFilteredBackingDataItems
+                return filterResults
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults) {
+                if (results.values == null) return
+                currentFilteredBackingDataItems = results.values as List<DataItem>
+                updateRenderedList()
+            }
+
+        }
     }
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
     private var currentBackingList: List<NitrolessRepoAndModel>? = null
     private var currentBackingDataItems: List<DataItem>? = null
+    private var currentFilteredBackingDataItems: List<DataItem>? = null
 
     // map of GROUP INDEX (should be the same size as List<NitroLessRepoAndModel below)
     // to expanded state (default all)
@@ -80,6 +117,7 @@ class HomeFragmentAdapter : Filterable, ListAdapter<DataItem, RecyclerView.ViewH
                 withContext(Dispatchers.Main) {
                     submitList(dataItems)
                     currentBackingDataItems = dataItems
+                    currentFilteredBackingDataItems = dataItems
                     notifyItemRangeChanged(0, list.size)
                 }
             }
@@ -92,7 +130,7 @@ class HomeFragmentAdapter : Filterable, ListAdapter<DataItem, RecyclerView.ViewH
         // to COLLAPSE, notifyItemRangeRemoved (int positionStart, int itemCount)
         // ListAdapter should call it for us!!
         val result: MutableList<DataItem> = ArrayList()
-        for (dataItem in currentBackingDataItems!!) {
+        for (dataItem in currentFilteredBackingDataItems!!) {
             if (dataItem.type == ITEM_VIEW_TYPE_HEADER) {
                 val casted =
                     (dataItem as DataItem.HeaderItem).copy() // lmao, DiffUtil checks identity.

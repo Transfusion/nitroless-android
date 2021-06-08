@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -19,7 +20,7 @@ import io.github.transfusion.nitroless.databinding.FragmentHomeBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
 
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var homeFragmentAdapter: HomeFragmentAdapter
 
@@ -32,6 +33,13 @@ class HomeFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        if (savedInstanceState != null) {
+            mSearchQuery = savedInstanceState.getString("searchQuery");
+        }
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,7 +83,7 @@ class HomeFragment : Fragment() {
 
 
         homeFragmentAdapter = HomeFragmentAdapter()
-        
+
         val gridLayoutManager = GridLayoutManager(requireContext(), noOfSpans)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
@@ -91,6 +99,9 @@ class HomeFragment : Fragment() {
         binding.homeRecyclerView.layoutManager = gridLayoutManager
 
         subscribeHomeFragmentAdapter(homeFragmentAdapter)
+
+        // bind SearchView
+        binding.emoteSearch.setOnQueryTextListener(this)
 
         return root
     }
@@ -123,6 +134,24 @@ class HomeFragment : Fragment() {
             Log.d(javaClass.name, "nasty loaded!!")
             Log.d(javaClass.name, it.toString())
         }
+    }
+
+    private var mSearchQuery: String? = null
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("searchQuery", mSearchQuery);
+        super.onSaveInstanceState(outState)
+    }
+
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        this.onQueryTextChange(query)
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        mSearchQuery = newText
+        homeFragmentAdapter.filter.filter(newText);
+        return false
     }
 
 }

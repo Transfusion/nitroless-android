@@ -148,7 +148,7 @@ public class CustomItemTouchHelper extends RecyclerView.ItemDecoration
 
     private static final String TAG = "ItemTouchHelper";
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static final int ACTIVE_POINTER_ID_NONE = -1;
 
