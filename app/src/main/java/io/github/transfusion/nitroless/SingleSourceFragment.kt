@@ -2,17 +2,20 @@ package io.github.transfusion.nitroless
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import io.github.transfusion.nitroless.adapters.SingleSourceAdapter
 import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
 import io.github.transfusion.nitroless.databinding.FragmentSingleSourceBinding
@@ -64,6 +67,25 @@ class SingleSourceFragment : Fragment(),
 
     private fun onEmoteClicked(emoteModel: NitrolessRepoEmoteModel) {
         Log.d(javaClass.name, "clicked on ${emoteModel.name}")
+        val mySnackbar =
+            Snackbar.make(
+                binding.singleSourceCoordinatorLayout,
+                "Copied ${emoteModel.name}",
+                Snackbar.LENGTH_SHORT
+            ).setAction("OK") {
+                // Responds to click on the action
+            }
+        // https://stackoverflow.com/questions/31746300/how-to-show-snackbar-at-top-of-the-screen/36768267
+        // not material-spec compliant but better than obscuring the
+        // bottom row
+        val view: View = mySnackbar.view
+        val params = view.layoutParams as CoordinatorLayout.LayoutParams
+        params.gravity = Gravity.CENTER_HORIZONTAL
+        params.width = CoordinatorLayout.LayoutParams.WRAP_CONTENT
+        view.layoutParams = params
+
+        mySnackbar.show()
+
     }
 
     override fun onCreateView(

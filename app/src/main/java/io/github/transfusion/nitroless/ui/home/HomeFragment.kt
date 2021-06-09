@@ -1,12 +1,15 @@
 package io.github.transfusion.nitroless.ui.home
 
 //import io.github.transfusion.nitroless.adapters.HomeSectionedAdapter
+
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -14,16 +17,12 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import io.github.transfusion.nitroless.MainActivity
 import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.adapters.HomeFragmentAdapter
 import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
 import io.github.transfusion.nitroless.databinding.FragmentHomeBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
-import android.view.Gravity
-
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 
 
 class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
