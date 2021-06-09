@@ -1,26 +1,34 @@
 package io.github.transfusion.nitroless.viewholders
 
-import android.net.Uri
 import android.util.Log
-import androidx.core.content.ContextCompat
+import android.widget.Toast
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.drawee.view.SimpleDraweeView
-import com.facebook.imagepipeline.request.ImageRequest
 import com.google.android.material.imageview.ShapeableImageView
 import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
 import io.github.transfusion.nitroless.databinding.EmoteCellBinding
 import java.net.URI
 
-class EmoteCellViewHolder(private val binding: EmoteCellBinding) :
+
+class EmoteCellViewHolder(
+    private val binding: EmoteCellBinding,
+    onEmoteClicked: (NitrolessRepoEmoteModel) -> Unit
+) :
     RecyclerView.ViewHolder(binding.root) {
 
     init {
         binding.setClickListener {
+            if (binding.emoteModel != null)
+                onEmoteClicked(binding.emoteModel!!)
+            /*toast?.cancel()
             Log.d(javaClass.name, "clicked on ${binding.emoteModel?.name}")
+
+            val text = "Copied ${binding.emoteModel?.name}"
+            val duration = Toast.LENGTH_SHORT
+            toast = Toast.makeText(it.context, text, duration)
+            toast?.show()*/
         }
     }
 
@@ -36,6 +44,8 @@ class EmoteCellViewHolder(private val binding: EmoteCellBinding) :
     // this also applies to BindingEmoteCellItem.kt! it manages its
     // own ViewHolder
     companion object {
+        private var toast: Toast? = null
+
         @JvmStatic
         @BindingAdapter(value = ["bind:baseUrl", "bind:path", "bind:imageUrl"])
         fun loadImage(

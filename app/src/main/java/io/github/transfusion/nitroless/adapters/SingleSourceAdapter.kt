@@ -11,7 +11,10 @@ import io.github.transfusion.nitroless.databinding.EmoteCellBinding
 import io.github.transfusion.nitroless.viewholders.EmoteCellViewHolder
 import java.util.*
 
-class SingleSourceAdapter(private val baseUrl: String) : Filterable,
+class SingleSourceAdapter(
+    val onEmoteClicked: (NitrolessRepoEmoteModel) -> Unit,
+    private val baseUrl: String
+) : Filterable,
     ListAdapter<NitrolessRepoEmoteModel, EmoteCellViewHolder>(NitrolessRepoEmoteModelDiffCallback()) {
 
     var mListRef: List<NitrolessRepoEmoteModel>? = null
@@ -20,7 +23,8 @@ class SingleSourceAdapter(private val baseUrl: String) : Filterable,
     var path: String? = null // in the index.json, must be set before submitList
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmoteCellViewHolder {
         return EmoteCellViewHolder(
-            EmoteCellBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            EmoteCellBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onEmoteClicked
         )
     }
 
@@ -66,6 +70,7 @@ class SingleSourceAdapter(private val baseUrl: String) : Filterable,
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
+                if (results.values == null) return
                 mFilteredList = results.values as List<NitrolessRepoEmoteModel>
                 submitList(mFilteredList)
             }

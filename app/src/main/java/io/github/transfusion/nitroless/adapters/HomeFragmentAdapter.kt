@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
+import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
 import io.github.transfusion.nitroless.databinding.EmoteCellBinding
 import io.github.transfusion.nitroless.databinding.HomeRecyclerviewSourceHeaderBinding
 import io.github.transfusion.nitroless.databinding.HomeRecyclerviewSourceMessageBinding
@@ -23,9 +24,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class HomeFragmentAdapter : Filterable, ListAdapter<DataItem, RecyclerView.ViewHolder>(
-    HomeSectionedDiffCallback()
-) {
+class HomeFragmentAdapter(val onEmoteClicked: (NitrolessRepoEmoteModel) -> Unit) : Filterable,
+    ListAdapter<DataItem, RecyclerView.ViewHolder>(
+        HomeSectionedDiffCallback()
+    ) {
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(charSequence: CharSequence?): FilterResults {
@@ -175,7 +177,8 @@ class HomeFragmentAdapter : Filterable, ListAdapter<DataItem, RecyclerView.ViewH
                 )
             )
             ITEM_VIEW_TYPE_EMOTE_ITEM -> EmoteCellViewHolder(
-                EmoteCellBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                EmoteCellBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                onEmoteClicked
             )
             else -> throw ClassCastException("Unknown viewType $viewType")
         }

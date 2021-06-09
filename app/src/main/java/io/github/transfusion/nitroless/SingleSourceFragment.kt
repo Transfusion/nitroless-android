@@ -14,11 +14,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import io.github.transfusion.nitroless.adapters.SingleSourceAdapter
+import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
 import io.github.transfusion.nitroless.databinding.FragmentSingleSourceBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
-import io.github.transfusion.nitroless.util.GridAutofitLayoutManager
-import io.github.transfusion.nitroless.util.GridSpacingItemDecoration
-import io.github.transfusion.nitroless.util.clearDecorations
 
 class SingleSourceFragment : Fragment(),
     SearchView.OnQueryTextListener {
@@ -64,6 +62,10 @@ class SingleSourceFragment : Fragment(),
         super.onCreate(savedInstanceState)
     }
 
+    private fun onEmoteClicked(emoteModel: NitrolessRepoEmoteModel) {
+        Log.d(javaClass.name, "clicked on ${emoteModel.name}")
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -88,7 +90,6 @@ class SingleSourceFragment : Fragment(),
         Log.d(javaClass.name, "calculated spans $noOfSpans")
 
 
-
         val layoutManager = GridLayoutManager(requireContext(), noOfSpans)
 
 //        val layoutManager = GridAutofitLayoutManager(requireContext(), 150)
@@ -106,7 +107,9 @@ class SingleSourceFragment : Fragment(),
 
         viewModel.currentRepo.observe(viewLifecycleOwner) { repo ->
             binding.collapsingToolbarLayout.title = repo.name
-            singleSourceAdapter = SingleSourceAdapter(repo.url)
+            singleSourceAdapter = SingleSourceAdapter({ emoteModel: NitrolessRepoEmoteModel ->
+                onEmoteClicked(emoteModel)
+            }, repo.url)
             subscribeSingleSourceAdapter(singleSourceAdapter!!)
 
             if (mSearchQuery != null) {
