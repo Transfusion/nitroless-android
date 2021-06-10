@@ -7,24 +7,28 @@ import android.widget.Filterable
 import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.ListAdapter
 import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
+import io.github.transfusion.nitroless.data.NitrolessRepoModel
 import io.github.transfusion.nitroless.databinding.EmoteCellBinding
+import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.viewholders.EmoteCellViewHolder
 import java.util.*
 
 class SingleSourceAdapter(
-    val onEmoteClicked: (NitrolessRepoEmoteModel) -> Unit,
-    private val baseUrl: String
+    val onEmoteClicked: (NitrolessRepo, NitrolessRepoModel, NitrolessRepoEmoteModel) -> Unit,
+    private val nitrolessRepo: NitrolessRepo
 ) : Filterable,
     ListAdapter<NitrolessRepoEmoteModel, EmoteCellViewHolder>(NitrolessRepoEmoteModelDiffCallback()) {
 
     var mListRef: List<NitrolessRepoEmoteModel>? = null
     var mFilteredList: List<NitrolessRepoEmoteModel>? = null
 
-    var path: String? = null // in the index.json, must be set before submitList
+    var nitrolessRepoModel: NitrolessRepoModel? =
+        null // in the index.json, must be set before submitList
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmoteCellViewHolder {
         return EmoteCellViewHolder(
-            EmoteCellBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            onEmoteClicked
+            EmoteCellBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
         )
     }
 
@@ -37,7 +41,9 @@ class SingleSourceAdapter(
 
     override fun onBindViewHolder(holder: EmoteCellViewHolder, position: Int) {
         val emoteModel = getItem(position)
-        holder.bind(baseUrl, path!!, emoteModel)
+        holder.bind(nitrolessRepo.url, nitrolessRepoModel!!.path, emoteModel) {
+            onEmoteClicked(nitrolessRepo, nitrolessRepoModel!!, emoteModel)
+        }
     }
 
     override fun getFilter(): Filter {

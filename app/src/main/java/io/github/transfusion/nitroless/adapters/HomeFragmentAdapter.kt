@@ -9,9 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
+import io.github.transfusion.nitroless.data.NitrolessRepoModel
 import io.github.transfusion.nitroless.databinding.EmoteCellBinding
 import io.github.transfusion.nitroless.databinding.HomeRecyclerviewSourceHeaderBinding
 import io.github.transfusion.nitroless.databinding.HomeRecyclerviewSourceMessageBinding
+import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.ui.home.*
 import io.github.transfusion.nitroless.viewholders.EmoteCellViewHolder
 import io.github.transfusion.nitroless.viewholders.HomeHeaderViewHolder
@@ -24,7 +26,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class HomeFragmentAdapter(val onEmoteClicked: (NitrolessRepoEmoteModel) -> Unit) : Filterable,
+class HomeFragmentAdapter(val onEmoteClicked: (NitrolessRepo, NitrolessRepoModel, NitrolessRepoEmoteModel) -> Unit) :
+    Filterable,
     ListAdapter<DataItem, RecyclerView.ViewHolder>(
         HomeSectionedDiffCallback()
     ) {
@@ -177,8 +180,7 @@ class HomeFragmentAdapter(val onEmoteClicked: (NitrolessRepoEmoteModel) -> Unit)
                 )
             )
             ITEM_VIEW_TYPE_EMOTE_ITEM -> EmoteCellViewHolder(
-                EmoteCellBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                onEmoteClicked
+                EmoteCellBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             )
             else -> throw ClassCastException("Unknown viewType $viewType")
         }
@@ -205,7 +207,9 @@ class HomeFragmentAdapter(val onEmoteClicked: (NitrolessRepoEmoteModel) -> Unit)
 
             is EmoteCellViewHolder -> {
                 val item = getItem(position) as DataItem.EmoteItem
-                holder.bind(item.nitrolessRepo.url, item.nitrolessRepoModel.path, item.emote)
+                holder.bind(item.nitrolessRepo.url, item.nitrolessRepoModel.path, item.emote) {
+                    onEmoteClicked(item.nitrolessRepo, item.nitrolessRepoModel, item.emote)
+                }
             }
         }
     }

@@ -4,28 +4,28 @@ package io.github.transfusion.nitroless.ui.home
 
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.adapters.HomeFragmentAdapter
 import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
+import io.github.transfusion.nitroless.data.NitrolessRepoModel
 import io.github.transfusion.nitroless.databinding.FragmentHomeBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
+import io.github.transfusion.nitroless.storage.NitrolessRepo
+import io.github.transfusion.nitroless.ui.interfaces.EmoteClickedInterface
 
 
-class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
+class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextListener {
 
     private lateinit var homeFragmentAdapter: HomeFragmentAdapter
 
@@ -46,28 +46,6 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
         super.onCreate(savedInstanceState)
     }
 
-    private fun onEmoteClicked(emoteModel: NitrolessRepoEmoteModel) {
-        Log.d(javaClass.name, "clicked on ${emoteModel.name}")
-        val mySnackbar =
-            Snackbar.make(
-                binding.homeCoordinatorLayout,
-                "Copied ${emoteModel.name}",
-                Snackbar.LENGTH_SHORT
-            ).setAction("OK") {
-                // Responds to click on the action
-            }
-        // https://stackoverflow.com/questions/31746300/how-to-show-snackbar-at-top-of-the-screen/36768267
-        // not material-spec compliant but better than obscuring the
-        // bottom row
-        val view: View = mySnackbar.view
-        val params = view.layoutParams as CoordinatorLayout.LayoutParams
-        params.gravity = Gravity.CENTER_HORIZONTAL
-        params.width = CoordinatorLayout.LayoutParams.WRAP_CONTENT
-        view.layoutParams = params
-
-        mySnackbar.show()
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -111,7 +89,16 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
 
 
         homeFragmentAdapter =
-            HomeFragmentAdapter { emoteModel: NitrolessRepoEmoteModel -> onEmoteClicked(emoteModel) }
+            HomeFragmentAdapter { nitrolessRepo: NitrolessRepo, nitrolessRepoModel: NitrolessRepoModel, emote: NitrolessRepoEmoteModel ->
+                onEmoteClicked(
+                    nitrolessRepo,
+                    nitrolessRepoModel,
+                    emote,
+
+                    binding.homeCoordinatorLayout,
+                    requireContext()
+                )
+            }
 
         val gridLayoutManager = GridLayoutManager(requireContext(), noOfSpans)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {

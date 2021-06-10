@@ -1,6 +1,5 @@
 package io.github.transfusion.nitroless.viewholders
 
-import android.util.Log
 import android.widget.Toast
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,15 +12,15 @@ import java.net.URI
 
 
 class EmoteCellViewHolder(
-    private val binding: EmoteCellBinding,
-    onEmoteClicked: (NitrolessRepoEmoteModel) -> Unit
+    private val binding: EmoteCellBinding
 ) :
     RecyclerView.ViewHolder(binding.root) {
 
+    private var callback: (() -> Unit)? = null
+
     init {
         binding.setClickListener {
-            if (binding.emoteModel != null)
-                onEmoteClicked(binding.emoteModel!!)
+            callback?.let { it1 -> it1() }
             /*toast?.cancel()
             Log.d(javaClass.name, "clicked on ${binding.emoteModel?.name}")
 
@@ -32,7 +31,8 @@ class EmoteCellViewHolder(
         }
     }
 
-    fun bind(_baseUrl: String, _path: String, item: NitrolessRepoEmoteModel) {
+    fun bind(_baseUrl: String, _path: String, item: NitrolessRepoEmoteModel, callback: () -> Unit) {
+        this.callback = callback
         binding.apply {
             baseUrl = _baseUrl
             path = _path
