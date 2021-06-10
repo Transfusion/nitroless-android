@@ -5,11 +5,12 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import java.util.*
 
 @Dao
 interface NitrolessRepoDao {
     @Query("SELECT * FROM nitrolessrepo WHERE id = :id")
-    fun getRepoById(id: Int): Flow<NitrolessRepo>
+    fun getRepoById(id: UUID): Flow<NitrolessRepo>
 
     @Query("SELECT * FROM nitrolessrepo")
     fun getAll(): Flow<List<NitrolessRepo>>

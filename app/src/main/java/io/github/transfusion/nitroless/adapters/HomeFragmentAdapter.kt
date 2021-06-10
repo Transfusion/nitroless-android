@@ -76,7 +76,7 @@ class HomeFragmentAdapter(val onEmoteClicked: (NitrolessRepo, NitrolessRepoModel
 
     // map of GROUP INDEX (should be the same size as List<NitroLessRepoAndModel below)
     // to expanded state (default all)
-    val expandedMap: HashMap<Int, Boolean> = HashMap()
+    val expandedMap: HashMap<UUID, Boolean> = HashMap()
     fun massageDataAndSubmitList(list: List<NitrolessRepoAndModel>) {
         currentBackingList = list
         adapterScope.launch {

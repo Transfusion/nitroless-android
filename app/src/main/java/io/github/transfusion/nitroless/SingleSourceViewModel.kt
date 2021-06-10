@@ -10,8 +10,9 @@ import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.storage.NitrolessRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.*
 
-class SingleSourceViewModel(private val repoId: Int, private val repository: NitrolessRepository) :
+class SingleSourceViewModel(private val repoId: UUID, private val repository: NitrolessRepository) :
     ViewModel() {
 
     private var _emotes: MutableLiveData<NitrolessRepoModel> = MutableLiveData()
@@ -51,7 +52,7 @@ class SingleSourceViewModel(private val repoId: Int, private val repository: Nit
 
 
 class SingleSourceViewModelFactory(
-    private val repoId: Int,
+    private val repoId: UUID,
     private val repository: NitrolessRepository
 ) :
     ViewModelProvider.Factory {

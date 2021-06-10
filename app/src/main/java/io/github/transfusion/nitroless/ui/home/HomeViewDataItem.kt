@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.DiffUtil
 import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
 import io.github.transfusion.nitroless.data.NitrolessRepoModel
 import io.github.transfusion.nitroless.storage.NitrolessRepo
+import java.util.UUID
 
 const val ITEM_VIEW_TYPE_HEADER = 10010
 const val ITEM_VIEW_TYPE_EMOTE_ITEM = 10011
@@ -12,7 +13,7 @@ const val ITEM_VIEW_TYPE_MESSAGE_ITEM = 10012 // e.g. "repo failed to load"
 
 sealed class DataItem {
     data class HeaderItem(
-        override var id: Int, val groupIndex: Int, val nitrolessRepo: NitrolessRepo,
+        override var id: Int, val groupIndex: UUID, val nitrolessRepo: NitrolessRepo,
         val subItems: Int
     ) : DataItem() {
         override val type = ITEM_VIEW_TYPE_HEADER

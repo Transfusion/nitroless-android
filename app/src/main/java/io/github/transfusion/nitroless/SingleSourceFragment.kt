@@ -20,6 +20,7 @@ import io.github.transfusion.nitroless.databinding.FragmentSingleSourceBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
 import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.ui.interfaces.EmoteClickedInterface
+import java.util.*
 
 class SingleSourceFragment : Fragment(), EmoteClickedInterface,
     SearchView.OnQueryTextListener {
@@ -35,7 +36,7 @@ class SingleSourceFragment : Fragment(), EmoteClickedInterface,
     private var mSearchQuery: String? = null
     private val viewModel: SingleSourceViewModel by viewModels {
         SingleSourceViewModelFactory(
-            requireArguments().getInt("NitrolessRepoId"),
+            requireArguments().getSerializable("NitrolessRepoId") as UUID,
             (requireActivity().application as NitrolessApplication).repository
         )
     }

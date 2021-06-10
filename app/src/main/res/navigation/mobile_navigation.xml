@@ -31,7 +31,7 @@
         tools:layout="@layout/fragment_single_source">
         <argument
             android:name="NitrolessRepoId"
-            app:argType="integer" />
+            app:argType="java.util.UUID" />
     </fragment>
 
 <!--    <fragment-->
