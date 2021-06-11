@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import io.github.transfusion.nitroless.BuildConfig
 import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.adapters.HomeFragmentAdapter
@@ -22,7 +23,9 @@ import io.github.transfusion.nitroless.data.NitrolessRepoModel
 import io.github.transfusion.nitroless.databinding.FragmentHomeBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
 import io.github.transfusion.nitroless.storage.NitrolessRepo
+import io.github.transfusion.nitroless.storage.RecentlyUsedEmote
 import io.github.transfusion.nitroless.ui.interfaces.EmoteClickedInterface
+import java.util.*
 
 
 class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextListener {
@@ -30,7 +33,8 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
     private lateinit var homeFragmentAdapter: HomeFragmentAdapter
 
     private val homeViewModel: HomeViewModel by viewModels {
-        HomeViewModelFactory((activity?.application as NitrolessApplication).repository)
+        val app = (activity?.application as NitrolessApplication)
+        HomeViewModelFactory(app.repository, app.recentlyUsedEmoteRepository)
     }
 
     private var _binding: FragmentHomeBinding? = null
@@ -98,6 +102,15 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
                     binding.homeCoordinatorLayout,
                     requireContext()
                 )
+                // insert into recently used
+                val recentlyUsedEmote = RecentlyUsedEmote(
+                    repoId = nitrolessRepo.id,
+                    emote_path = nitrolessRepoModel.path,
+                    emote_name = emote.name,
+                    emote_type = emote.type,
+                    emote_used = Date()
+                )
+                homeViewModel.insertRecentlyUsed(recentlyUsedEmote)
             }
 
         val gridLayoutManager = GridLayoutManager(requireContext(), noOfSpans)
@@ -147,8 +160,8 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
 
         homeViewModel.nitrolessRepoAndModels.observe(viewLifecycleOwner) {
-            Log.d(javaClass.name, "nasty loaded!!")
-            Log.d(javaClass.name, it.toString())
+            if (BuildConfig.DEBUG)
+                Log.d(javaClass.name, it.toString())
         }
     }
 

@@ -1,7 +1,7 @@
 package io.github.transfusion.nitroless.storage
 
 import androidx.room.TypeConverter
-import java.util.UUID
+import java.util.*
 
 class DBTypeConverters {
     @TypeConverter
@@ -12,5 +12,16 @@ class DBTypeConverters {
     @TypeConverter
     fun uuidFromString(string: String?): UUID? {
         return UUID.fromString(string)
+    }
+
+
+    @TypeConverter
+    fun toDate(dateLong: Long): Date {
+        return Date(dateLong)
+    }
+
+    @TypeConverter
+    fun fromDate(date: Date?): Long? {
+        return date?.time
     }
 }

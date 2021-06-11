@@ -8,9 +8,13 @@ import io.github.transfusion.nitroless.network.NitrolessRepoEndpoints
 import io.github.transfusion.nitroless.network.ServiceBuilder
 import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.storage.NitrolessRepository
+import io.github.transfusion.nitroless.storage.RecentlyUsedEmote
+import io.github.transfusion.nitroless.storage.RecentlyUsedEmoteRepository
 import io.github.transfusion.nitroless.util.pmap
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 // combination of NitrolessRepo and NitrolessRepoModel
 data class NitrolessRepoAndModel(
@@ -18,7 +22,16 @@ data class NitrolessRepoAndModel(
     val nitrolessRepoModel: NitrolessRepoModel?
 )
 
-class HomeViewModel(private val repository: NitrolessRepository) : ViewModel() {
+class HomeViewModel(
+    private val repository: NitrolessRepository,
+    private val recentlyUsedEmoteRepository: RecentlyUsedEmoteRepository
+) : ViewModel() {
+
+    fun insertRecentlyUsed(recentlyUsedEmote: RecentlyUsedEmote) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            recentlyUsedEmoteRepository.insert(recentlyUsedEmote)
+        }
+    }
 
     private var _status = MutableLiveData(LOADINGSTATUS.READY)
     val status: LiveData<LOADINGSTATUS> = _status
@@ -28,6 +41,10 @@ class HomeViewModel(private val repository: NitrolessRepository) : ViewModel() {
         MutableLiveData()
 
     val nitrolessRepoAndModels: LiveData<List<NitrolessRepoAndModel>> = _nitrolessRepoAndModels
+
+
+    val recentlyUsedEmoteAndRepos = recentlyUsedEmoteRepository.recentlyUsedEmotes.asLiveData()
+
     /*val nitrolessRepoAndModels = repository.repos.map { repo ->
         repo.pmap {
             val serviceBuilder = ServiceBuilder(it.url)
@@ -90,12 +107,15 @@ class HomeViewModel(private val repository: NitrolessRepository) : ViewModel() {
 }
 
 
-class HomeViewModelFactory(private val repository: NitrolessRepository) :
+class HomeViewModelFactory(
+    private val repository: NitrolessRepository,
+    private val recentlyUsedEmoteRepository: RecentlyUsedEmoteRepository
+) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(repository) as T
+            return HomeViewModel(repository, recentlyUsedEmoteRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

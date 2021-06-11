@@ -9,13 +9,32 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import java.util.*
 
-@Database(entities = [NitrolessRepo::class], version = 2)
+@Database(
+    entities = [NitrolessRepo::class, RecentlyUsedEmote::class],
+    version = 4
+)
 @TypeConverters(DBTypeConverters::class)
 abstract class NitrolessRepoDatabase : RoomDatabase() {
     abstract fun nitrolessDao(): NitrolessRepoDao
+    abstract fun recentlyUsedEmoteDao(): RecentlyUsedEmoteDao
 
 
     companion object {
+        @JvmField
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE recentlyusedemote (emote_id TEXT NOT NULL PRIMARY KEY, repoId TEXT NOT NULL, emote_path TEXT NOT NULL, emote_name TEXT NOT NULL, emote_type TEXT NOT NULL, emote_used INTEGER NOT NULL, FOREIGN KEY(`repoId`) REFERENCES `NitrolessRepo`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+            }
+        }
+
+        @JvmField
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DELETE FROM recentlyusedemote")
+                database.execSQL("CREATE UNIQUE INDEX index_unq_recently_used ON recentlyusedemote (repoId, emote_path, emote_name, emote_type)")
+            }
+        }
+
         @JvmField
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -49,7 +68,7 @@ abstract class NitrolessRepoDatabase : RoomDatabase() {
                     context.applicationContext,
                     NitrolessRepoDatabase::class.java,
                     "nitroless"
-                ).addMigrations(MIGRATION_1_2).build()
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
                 INSTANCE = instance
                 // return instance
                 instance
