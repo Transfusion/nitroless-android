@@ -19,6 +19,7 @@ import io.github.transfusion.nitroless.data.NitrolessRepoModel
 import io.github.transfusion.nitroless.databinding.FragmentSingleSourceBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
 import io.github.transfusion.nitroless.storage.NitrolessRepo
+import io.github.transfusion.nitroless.storage.RecentlyUsedEmote
 import io.github.transfusion.nitroless.ui.interfaces.EmoteClickedInterface
 import java.util.*
 
@@ -37,7 +38,8 @@ class SingleSourceFragment : Fragment(), EmoteClickedInterface,
     private val viewModel: SingleSourceViewModel by viewModels {
         SingleSourceViewModelFactory(
             requireArguments().getSerializable("NitrolessRepoId") as UUID,
-            (requireActivity().application as NitrolessApplication).repository
+            (requireActivity().application as NitrolessApplication).repository,
+            (requireActivity().application as NitrolessApplication).recentlyUsedEmoteRepository
         )
     }
 
@@ -112,12 +114,21 @@ class SingleSourceFragment : Fragment(), EmoteClickedInterface,
                 { nitrolessRepo: NitrolessRepo, nitrolessRepoModel: NitrolessRepoModel, nitrolessRepoEmoteModel: NitrolessRepoEmoteModel ->
                     onEmoteClicked(
                         nitrolessRepo,
-                        nitrolessRepoModel,
+                        nitrolessRepoModel.path,
                         nitrolessRepoEmoteModel,
 
                         binding.singleSourceCoordinatorLayout,
                         requireContext()
                     )
+                    // insert into recently used
+                    val recentlyUsedEmote = RecentlyUsedEmote(
+                        repoId = nitrolessRepo.id,
+                        emote_path = nitrolessRepoModel.path,
+                        emote_name = nitrolessRepoEmoteModel.name,
+                        emote_type = nitrolessRepoEmoteModel.type,
+                        emote_used = Date()
+                    )
+                    viewModel.insertRecentlyUsed(recentlyUsedEmote)
                 },
                 repo
             )

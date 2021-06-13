@@ -9,7 +9,6 @@ import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.snackbar.Snackbar
 import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
-import io.github.transfusion.nitroless.data.NitrolessRepoModel
 import io.github.transfusion.nitroless.storage.NitrolessRepo
 import java.net.URI
 
@@ -17,7 +16,7 @@ interface EmoteClickedInterface {
 
     fun onEmoteClicked(
         nitrolessRepo: NitrolessRepo,
-        nitrolessRepoModel: NitrolessRepoModel,
+        path: String,
         emote: NitrolessRepoEmoteModel,
 
         coordinatorLayout: CoordinatorLayout,
@@ -46,7 +45,7 @@ interface EmoteClickedInterface {
         // construct the URI
         var javaURI = URI(nitrolessRepo.url)
         val newPath =
-            "${javaURI.path}/${nitrolessRepoModel.path}/${emote.name}${emote.type}"
+            "${javaURI.path}/${path}/${emote.name}${emote.type}"
         javaURI = javaURI.resolve(newPath)
 
         // copy the URI to clipboard

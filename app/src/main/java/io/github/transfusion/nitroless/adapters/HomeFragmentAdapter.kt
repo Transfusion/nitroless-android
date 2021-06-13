@@ -26,7 +26,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class HomeFragmentAdapter(val onEmoteClicked: (NitrolessRepo, NitrolessRepoModel, NitrolessRepoEmoteModel) -> Unit) :
+class HomeFragmentAdapter(val onEmoteClicked: (NitrolessRepo, String, NitrolessRepoEmoteModel) -> Unit) :
     Filterable,
     ListAdapter<DataItem, RecyclerView.ViewHolder>(
         HomeSectionedDiffCallback()
@@ -120,10 +120,11 @@ class HomeFragmentAdapter(val onEmoteClicked: (NitrolessRepo, NitrolessRepoModel
                 }
 
                 withContext(Dispatchers.Main) {
-                    submitList(dataItems)
+                    super.submitList(dataItems)
                     currentBackingDataItems = dataItems
                     currentFilteredBackingDataItems = dataItems
-                    notifyItemRangeChanged(0, list.size)
+//                    notifyItemRangeChanged(0, list.size)
+                    notifyDataSetChanged()
                 }
             }
         }
@@ -208,7 +209,7 @@ class HomeFragmentAdapter(val onEmoteClicked: (NitrolessRepo, NitrolessRepoModel
             is EmoteCellViewHolder -> {
                 val item = getItem(position) as DataItem.EmoteItem
                 holder.bind(item.nitrolessRepo.url, item.nitrolessRepoModel.path, item.emote) {
-                    onEmoteClicked(item.nitrolessRepo, item.nitrolessRepoModel, item.emote)
+                    onEmoteClicked(item.nitrolessRepo, item.nitrolessRepoModel.path, item.emote)
                 }
             }
         }

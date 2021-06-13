@@ -8,11 +8,18 @@ import io.github.transfusion.nitroless.network.NitrolessRepoEndpoints
 import io.github.transfusion.nitroless.network.ServiceBuilder
 import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.storage.NitrolessRepository
+import io.github.transfusion.nitroless.storage.RecentlyUsedEmote
+import io.github.transfusion.nitroless.storage.RecentlyUsedEmoteRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
-class SingleSourceViewModel(private val repoId: UUID, private val repository: NitrolessRepository) :
+class SingleSourceViewModel(
+    private val repoId: UUID, private val repository: NitrolessRepository,
+    private val recentlyUsedEmoteRepository: RecentlyUsedEmoteRepository
+) :
     ViewModel() {
 
     private var _emotes: MutableLiveData<NitrolessRepoModel> = MutableLiveData()
@@ -48,18 +55,26 @@ class SingleSourceViewModel(private val repoId: UUID, private val repository: Ni
     }
 
 
+    fun insertRecentlyUsed(recentlyUsedEmote: RecentlyUsedEmote) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            recentlyUsedEmoteRepository.insert(recentlyUsedEmote)
+        }
+    }
+
+
 }
 
 
 class SingleSourceViewModelFactory(
     private val repoId: UUID,
-    private val repository: NitrolessRepository
+    private val repository: NitrolessRepository,
+    private val recentlyUsedEmoteRepository: RecentlyUsedEmoteRepository
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SingleSourceViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return SingleSourceViewModel(repoId, repository) as T
+            return SingleSourceViewModel(repoId, repository, recentlyUsedEmoteRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

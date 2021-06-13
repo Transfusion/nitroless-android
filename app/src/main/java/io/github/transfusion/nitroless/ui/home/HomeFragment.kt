@@ -13,13 +13,14 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import io.github.transfusion.nitroless.BuildConfig
 import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.adapters.HomeFragmentAdapter
+import io.github.transfusion.nitroless.adapters.RecentlyUsedEmotesAdapter
 import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
-import io.github.transfusion.nitroless.data.NitrolessRepoModel
 import io.github.transfusion.nitroless.databinding.FragmentHomeBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
 import io.github.transfusion.nitroless.storage.NitrolessRepo
@@ -31,6 +32,8 @@ import java.util.*
 class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextListener {
 
     private lateinit var homeFragmentAdapter: HomeFragmentAdapter
+
+    private lateinit var recentlyUsedEmotesAdapter: RecentlyUsedEmotesAdapter
 
     private val homeViewModel: HomeViewModel by viewModels {
         val app = (activity?.application as NitrolessApplication)
@@ -93,10 +96,10 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
 
 
         homeFragmentAdapter =
-            HomeFragmentAdapter { nitrolessRepo: NitrolessRepo, nitrolessRepoModel: NitrolessRepoModel, emote: NitrolessRepoEmoteModel ->
+            HomeFragmentAdapter { nitrolessRepo: NitrolessRepo, path: String, emote: NitrolessRepoEmoteModel ->
                 onEmoteClicked(
                     nitrolessRepo,
-                    nitrolessRepoModel,
+                    path,
                     emote,
 
                     binding.homeCoordinatorLayout,
@@ -105,7 +108,27 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
                 // insert into recently used
                 val recentlyUsedEmote = RecentlyUsedEmote(
                     repoId = nitrolessRepo.id,
-                    emote_path = nitrolessRepoModel.path,
+                    emote_path = path,
+                    emote_name = emote.name,
+                    emote_type = emote.type,
+                    emote_used = Date()
+                )
+                homeViewModel.insertRecentlyUsed(recentlyUsedEmote)
+            }
+        recentlyUsedEmotesAdapter =
+            RecentlyUsedEmotesAdapter { nitrolessRepo: NitrolessRepo, path: String, emote: NitrolessRepoEmoteModel ->
+                onEmoteClicked(
+                    nitrolessRepo,
+                    path,
+                    emote,
+
+                    binding.homeCoordinatorLayout,
+                    requireContext()
+                )
+                // insert into recently used
+                val recentlyUsedEmote = RecentlyUsedEmote(
+                    repoId = nitrolessRepo.id,
+                    emote_path = path,
                     emote_name = emote.name,
                     emote_type = emote.type,
                     emote_used = Date()
@@ -113,25 +136,34 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
                 homeViewModel.insertRecentlyUsed(recentlyUsedEmote)
             }
 
+        val config = ConcatAdapter.Config.Builder().apply {
+            setIsolateViewTypes(false).setStableIdMode(ConcatAdapter.Config.StableIdMode.NO_STABLE_IDS)
+        }.build()
+
+        val concatAdapter = ConcatAdapter(config, recentlyUsedEmotesAdapter, homeFragmentAdapter)
+
         val gridLayoutManager = GridLayoutManager(requireContext(), noOfSpans)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when (homeFragmentAdapter.getItemViewType(position)) {
+                return when (concatAdapter.getItemViewType(position)) {
                     ITEM_VIEW_TYPE_EMOTE_ITEM -> 1
+                    ITEM_VIEW_TYPE_RECENT_EMOTE_ITEM -> 1
                     ITEM_VIEW_TYPE_MESSAGE_ITEM -> noOfSpans
                     ITEM_VIEW_TYPE_HEADER -> noOfSpans
+                    ITEM_VIEW_TYPE_RECENT_HEADER -> noOfSpans
                     else -> -1
                 }
             }
         }
 
         binding.homeRecyclerView.layoutManager = gridLayoutManager
-
         subscribeHomeFragmentAdapter(homeFragmentAdapter)
+        subscribeRecentlyUsedEmotesAdapter(recentlyUsedEmotesAdapter)
 
         // bind SearchView
         binding.emoteSearch.setOnQueryTextListener(this)
 
+        binding.homeRecyclerView.adapter = concatAdapter
         return root
     }
 
@@ -139,7 +171,12 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
         homeViewModel.nitrolessRepoAndModels.observe(viewLifecycleOwner) {
             adapter.massageDataAndSubmitList(it)
         }
-        binding.homeRecyclerView.adapter = adapter
+    }
+
+    private fun subscribeRecentlyUsedEmotesAdapter(adapter: RecentlyUsedEmotesAdapter) {
+        homeViewModel.recentlyUsedEmoteAndRepos.observe(viewLifecycleOwner) {
+            adapter.massageDataAndSubmitList(it)
+        }
     }
 
 
