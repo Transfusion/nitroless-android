@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="progressBarVisible"
+            type="java.lang.Boolean" />
+    </data>
+
+
+    <merge tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/emote_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+            android:background="@drawable/searchview_background"
+            android:focusedByDefault="false"
+            app:iconifiedByDefault="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:queryBackground="@android:color/transparent"
+            app:queryHint="@string/emote_name" />
+
+        <!--<TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="kekkakergoaj1234"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />-->
+
+        <android.inputmethodservice.KeyboardView
+            android:id="@+id/keyboard_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+
+        </android.inputmethodservice.KeyboardView>
+
+    </merge>
+
+</layout>
