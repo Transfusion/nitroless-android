@@ -5,17 +5,27 @@ import android.inputmethodservice.Keyboard
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener
 import android.os.IBinder
 import android.text.InputType
-import android.text.method.MetaKeyKeyListener
+import android.text.TextUtils
 import android.util.Log
-import android.view.KeyCharacterMap
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodSubtype
+import androidx.lifecycle.*
+import androidx.savedstate.SavedStateRegistry
+import androidx.savedstate.SavedStateRegistryController
+import androidx.savedstate.SavedStateRegistryOwner
+import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import io.github.transfusion.nitroless.BuildConfig
+import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
+import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
+import io.github.transfusion.nitroless.storage.NitrolessRepo
+import io.github.transfusion.nitroless.ui.home.HomeViewModel
+import io.github.transfusion.nitroless.ui.home.HomeViewModelFactory
+import io.github.transfusion.nitroless.ui.interfaces.EmoteClickedInterface
 
 
 /**
@@ -25,7 +35,10 @@ import io.github.transfusion.nitroless.R
  * a basic example for how you would get started writing an input method, to
  * be fleshed out as appropriate.
  */
-class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListener {
+class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListener,
+    ViewModelStoreOwner, LifecycleOwner, LifecycleObserver, SavedStateRegistryOwner,
+    EmoteClickedInterface {
+
     private var mInputMethodManager: InputMethodManager? = null
     private var mInputView: LatinKeyboardView? = null
     private val mComposing = StringBuilder()
@@ -41,6 +54,9 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
     private var wordSeparators: String? = null
 
     private lateinit var nitrolessMainKeyboardView: NitrolessMainKeyboardView
+
+    private lateinit var emoteSearchInputConnection: InputConnection
+
 //    private var keyboardDragDelegate: KeyboardDragDelegate? = null
 
     /**
@@ -49,10 +65,23 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
      */
     override fun onCreate() {
         super.onCreate()
+        savedStateRegistry.performRestore(null)
+        handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+
         mInputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         wordSeparators = resources.getString(R.string.word_separators)
 //        keyboardDragDelegate = KeyboardDragDelegate(this, window.window)
+
+        lifecycle.addObserver(this)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    }
+
+    /* @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun started() {} */
 
     /**
      * This is the point where you can do all of your UI initialization.  It
@@ -73,6 +102,8 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
         mSymbolsKeyboard = LatinKeyboard(this, R.xml.symbols)
         mSymbolsShiftedKeyboard = LatinKeyboard(this, R.xml.symbols_shift)
     }
+
+    lateinit var homeViewModel: HomeViewModel
 
     /**
      * Called by the framework when your view for creating input needs to
@@ -97,14 +128,49 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
         setLatinKeyboard(mQwertyKeyboard)
         return keyboardParent*/
 
+        handleLifecycleEvent(Lifecycle.Event.ON_START)
+        val app = (application as NitrolessApplication)
+        homeViewModel = ViewModelProvider(
+            this,
+            HomeViewModelFactory(app.repository, app.recentlyUsedEmoteRepository)
+        ).get(HomeViewModel::class.java)
+
         nitrolessMainKeyboardView = NitrolessMainKeyboardView(this)
+        ViewTreeLifecycleOwner.set(nitrolessMainKeyboardView, this)
+        ViewTreeViewModelStoreOwner.set(nitrolessMainKeyboardView, this)
+        ViewTreeSavedStateRegistryOwner.set(nitrolessMainKeyboardView, this)
+
+        emoteSearchInputConnection =
+            CustomInputConnection(nitrolessMainKeyboardView.emoteSearch.getSearchAutoComplete())
+
+        homeViewModel.status.observe(owner = this) {
+            Log.d(javaClass.name, it.toString())
+            nitrolessMainKeyboardView.setStatus(it)
+        }
+
         mInputView = nitrolessMainKeyboardView.inputView
         mInputView!!.setOnKeyboardActionListener(this)
-        mInputView!!.isPreviewEnabled = false
+//        mInputView!!.isPreviewEnabled = false
         setLatinKeyboard(mQwertyKeyboard)
         return nitrolessMainKeyboardView
     }
 
+    private val activeInputConnection: InputConnection?
+        get() {
+            return if (nitrolessMainKeyboardView.emoteSearchFocused) {
+                emoteSearchInputConnection
+            } else {
+                currentInputConnection
+            }
+        }
+
+    fun onEmoteClicked(
+        nitrolessRepo: NitrolessRepo,
+        path: String,
+        emote: NitrolessRepoEmoteModel,
+    ) {
+        Log.d(javaClass.name, "ime emote click ${emote.name}")
+    }
 
     private fun setLatinKeyboard(nextKeyboard: LatinKeyboard?) {
         val shouldSupportLanguageSwitchKey =
@@ -241,14 +307,14 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
         mInputView!!.setSubtypeOnSpaceKey()
     }
 
-    private val navBarHeight: Int
+    /*private val navBarHeight: Int
         get() {
             val resources = resources
             val resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
             return if (resourceId > 0) {
                 resources.getDimensionPixelSize(resourceId)
             } else 0
-        }
+        }*/
 
     /**
      * Deal with the editor reporting movement of its cursor.
@@ -316,6 +382,7 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
      * continue to the app.
      */
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        Log.d(javaClass.name, "onKeyDown $keyCode")
         when (keyCode) {
             KeyEvent.KEYCODE_BACK ->                 // The InputMethodService already takes care of the back
                 // key for us, to dismiss the input method if it is shown.
@@ -330,13 +397,18 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
                 // Special handling of the delete key: if we currently are
                 // composing text for the user, we want to modify that instead
                 // of let the application to the delete itself.
-                if (mComposing.isNotEmpty()) {
-                    onKey(Keyboard.KEYCODE_DELETE, intArrayOf())
-                    return true
-                }
+//                if (mComposing.isNotEmpty())
+            {
+                onKey(Keyboard.KEYCODE_DELETE, intArrayOf())
+                return true
+            }
             KeyEvent.KEYCODE_ENTER ->                 // Let the underlying text editor always handle these.
-                return false
+            {
+                return handleReturn()
+            }
             else -> {
+                onKey(event.unicodeChar, intArrayOf())
+                return true
             }
         }
         return super.onKeyDown(keyCode, event)
@@ -390,10 +462,10 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
      * Helper to send a key down / key up pair to the current editor.
      */
     private fun keyDownUp(keyEventCode: Int) {
-        currentInputConnection.sendKeyEvent(
+        activeInputConnection?.sendKeyEvent(
             KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode)
         )
-        currentInputConnection.sendKeyEvent(
+        activeInputConnection?.sendKeyEvent(
             KeyEvent(KeyEvent.ACTION_UP, keyEventCode)
         )
     }
@@ -407,7 +479,7 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
             else -> if (keyCode >= '0'.toInt() && keyCode <= '9'.toInt()) {
                 keyDownUp(keyCode - '0'.toInt() + KeyEvent.KEYCODE_0)
             } else {
-                currentInputConnection.commitText(keyCode.toChar().toString(), 1)
+                activeInputConnection?.commitText(keyCode.toChar().toString(), 1)
             }
         }
     }
@@ -416,37 +488,50 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
     override fun onKey(primaryCode: Int, keyCodes: IntArray) {
         if (BuildConfig.DEBUG)
             Log.d("Test", "KEYCODE: $primaryCode")
-        if (isWordSeparator(primaryCode)) {
-            // Handle separator
-            if (mComposing.isNotEmpty()) {
-                commitTyped(currentInputConnection)
+        when {
+            // should fall through to the isWordSeparator check below if
+            // emotesView is not focused
+            primaryCode == LatinKeyboardView.KEYCODE_RETURN && handleReturn() -> {
             }
-            sendKey(primaryCode)
-            updateShiftKeyState(currentInputEditorInfo)
-        } else if (primaryCode == Keyboard.KEYCODE_DELETE) {
-            handleBackspace()
-        } else if (primaryCode == Keyboard.KEYCODE_SHIFT) {
-            handleShift()
-        } else if (primaryCode == Keyboard.KEYCODE_CANCEL) {
-            handleClose()
-            return
-        } else if (primaryCode == LatinKeyboardView.KEYCODE_LANGUAGE_SWITCH) {
-            handleLanguageSwitch()
-            return
-        } else if (primaryCode == LatinKeyboardView.KEYCODE_OPTIONS) {
-            // Show a menu or somethin'
-        } else if (primaryCode == Keyboard.KEYCODE_MODE_CHANGE
-            && mInputView != null
-        ) {
-            val current = mInputView!!.keyboard
-            if (current === mSymbolsKeyboard || current === mSymbolsShiftedKeyboard) {
-                setLatinKeyboard(mQwertyKeyboard)
-            } else {
-                setLatinKeyboard(mSymbolsKeyboard)
-                mSymbolsKeyboard!!.isShifted = false
+            isWordSeparator(primaryCode) -> {
+                // Handle separator
+                if (mComposing.isNotEmpty()) {
+                    commitTyped(currentInputConnection)
+                }
+                sendKey(primaryCode)
+                updateShiftKeyState(currentInputEditorInfo)
             }
-        } else {
-            handleCharacter(primaryCode, keyCodes)
+            primaryCode == Keyboard.KEYCODE_DELETE -> {
+                handleBackspace()
+            }
+            primaryCode == Keyboard.KEYCODE_SHIFT -> {
+                handleShift()
+            }
+            primaryCode == Keyboard.KEYCODE_CANCEL -> {
+                handleClose()
+            }
+            primaryCode == LatinKeyboardView.KEYCODE_LANGUAGE_SWITCH -> {
+                handleLastInputMethod()
+            }
+            primaryCode == LatinKeyboardView.KEYCODE_SHOW_LANGUAGE_PICKER -> {
+                handleLanguageSwitch()
+            }
+            primaryCode == LatinKeyboardView.KEYCODE_OPTIONS -> {
+                // Show a menu or somethin'
+            }
+            primaryCode == Keyboard.KEYCODE_MODE_CHANGE
+                    && mInputView != null -> {
+                val current = mInputView!!.keyboard
+                if (current === mSymbolsKeyboard || current === mSymbolsShiftedKeyboard) {
+                    setLatinKeyboard(mQwertyKeyboard)
+                } else {
+                    setLatinKeyboard(mSymbolsKeyboard)
+                    mSymbolsKeyboard!!.isShifted = false
+                }
+            }
+            else -> {
+                handleCharacter(primaryCode, keyCodes)
+            }
         }
     }
 
@@ -462,15 +547,28 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
     }
 
     private fun handleBackspace() {
-        val length = mComposing.length
-        if (length > 1) {
-            mComposing.delete(length - 1, length)
-            currentInputConnection.setComposingText(mComposing, 1)
-        } else if (length > 0) {
-            mComposing.setLength(0)
-            currentInputConnection.commitText("", 0)
+        /*val length = mComposing.length
+        when {
+            length > 1 -> {
+                mComposing.delete(length - 1, length)
+                activeInputConnection?.setComposingText(mComposing, 1)
+            }
+            length > 0 -> {
+                mComposing.setLength(0)
+                activeInputConnection?.commitText("", 0)
+            }
+            else -> {
+                keyDownUp(KeyEvent.KEYCODE_DEL)
+            }
+        }*/
+
+        val selectedText: CharSequence? = activeInputConnection?.getSelectedText(0)
+        if (TextUtils.isEmpty(selectedText)) {
+            // no selection, so delete previous character
+            activeInputConnection?.deleteSurroundingText(1, 0)
         } else {
-            keyDownUp(KeyEvent.KEYCODE_DEL)
+            // delete the selection
+            activeInputConnection?.commitText("", 1)
         }
         updateShiftKeyState(currentInputEditorInfo)
     }
@@ -502,13 +600,22 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
                 primaryCode = Character.toUpperCase(primaryCode)
             }
         }
-        currentInputConnection.commitText(primaryCode.toChar().toString(), 1)
+        activeInputConnection?.commitText(primaryCode.toChar().toString(), 1)
     }
 
     private fun handleClose() {
-        commitTyped(currentInputConnection)
+        /*commitTyped(currentInputConnection)
         requestHideSelf(0)
-        mInputView!!.closing()
+        mInputView!!.closing()*/
+        nitrolessMainKeyboardView.showEmotesView()
+    }
+
+    private fun handleReturn(): Boolean {
+        if (nitrolessMainKeyboardView.emoteSearchFocused) {
+            nitrolessMainKeyboardView.submitQuery()
+            return true
+        }
+        return false
     }
 
     private val token: IBinder?
@@ -518,8 +625,12 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
             return window.attributes.token
         }
 
+    private fun handleLastInputMethod() {
+        mInputMethodManager!!.switchToLastInputMethod(token /*  false onlyCurrentIme */)
+    }
+
     private fun handleLanguageSwitch() {
-        mInputMethodManager!!.switchToNextInputMethod(token, false /* onlyCurrentIme */)
+        mInputMethodManager?.showInputMethodPicker()
     }
 
     private fun checkToggleCapsLock() {
@@ -572,4 +683,20 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
         private const val TAG = "SoftKeyboard"
         private const val NOT_A_LENGTH = -1
     }
+
+    private val store = ViewModelStore()
+    override fun getViewModelStore(): ViewModelStore = store
+
+    //    Lifecycle Methods
+    private var lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
+    override fun getLifecycle(): Lifecycle {
+        return lifecycleRegistry
+    }
+
+    private fun handleLifecycleEvent(event: Lifecycle.Event) =
+        lifecycleRegistry.handleLifecycleEvent(event)
+
+    //    SavedStateRegistry Methods
+    private val savedStateRegistry = SavedStateRegistryController.create(this)
+    override fun getSavedStateRegistry(): SavedStateRegistry = savedStateRegistry.savedStateRegistry
 }

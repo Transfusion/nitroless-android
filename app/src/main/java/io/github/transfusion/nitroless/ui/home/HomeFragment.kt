@@ -15,7 +15,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
-import io.github.transfusion.nitroless.BuildConfig
 import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.adapters.HomeFragmentAdapter
@@ -196,10 +195,10 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
         )
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
 
-        homeViewModel.nitrolessRepoAndModels.observe(viewLifecycleOwner) {
+        /*homeViewModel.nitrolessRepoAndModels.observe(viewLifecycleOwner) {
             if (BuildConfig.DEBUG)
                 Log.d(javaClass.name, it.toString())
-        }
+        }*/
     }
 
     private var mSearchQuery: String? = null

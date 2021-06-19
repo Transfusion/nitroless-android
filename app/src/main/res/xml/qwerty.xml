@@ -152,14 +152,14 @@
 
     <Row android:rowEdgeFlags="bottom">
         <Key
-            android:codes="-3"
-            android:keyWidth="15%p"
-            android:keyEdgeFlags="left"
-            android:keyIcon="@drawable/sym_keyboard_done" />
-        <Key
             android:codes="-2"
             android:keyWidth="10%p"
+            android:keyEdgeFlags="left"
             android:keyLabel="123" />
+        <Key
+            android:codes="-3"
+            android:keyWidth="15%p"
+            android:keyIcon="@drawable/ic_baseline_emoji_emotions_24" />
         <!--
             android:codes: -101 is not a framework-defined key code but a key code that is
             privately defined in com.example.android.softkeyboard.LatinKeyboardView.

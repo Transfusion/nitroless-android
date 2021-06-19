@@ -16,12 +16,11 @@
 package io.github.transfusion.nitroless.ime
 
 import android.content.Context
-import android.inputmethodservice.KeyboardView
 import android.inputmethodservice.Keyboard
+import android.inputmethodservice.KeyboardView
 import android.util.AttributeSet
 import android.util.Log
 import androidx.appcompat.view.ContextThemeWrapper
-import io.github.transfusion.nitroless.ime.LatinKeyboardView
 
 class LatinKeyboardView : KeyboardView {
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
@@ -40,11 +39,18 @@ class LatinKeyboardView : KeyboardView {
     }
 
     override fun onLongPress(key: Keyboard.Key): Boolean {
-        return if (key.codes[0] == Keyboard.KEYCODE_CANCEL) {
-            onKeyboardActionListener.onKey(KEYCODE_OPTIONS, intArrayOf())
-            true
-        } else {
-            super.onLongPress(key)
+        return when {
+            key.codes[0] == Keyboard.KEYCODE_CANCEL -> {
+                onKeyboardActionListener.onKey(KEYCODE_OPTIONS, intArrayOf())
+                true
+            }
+            key.codes[0] == KEYCODE_LANGUAGE_SWITCH -> {
+                onKeyboardActionListener.onKey(KEYCODE_SHOW_LANGUAGE_PICKER, intArrayOf())
+                true
+            }
+            else -> {
+                super.onLongPress(key)
+            }
         }
     }
 
@@ -78,7 +84,9 @@ class LatinKeyboardView : KeyboardView {
     }*/
 
     companion object {
+        const val KEYCODE_RETURN = 10
         const val KEYCODE_OPTIONS = -100
         const val KEYCODE_LANGUAGE_SWITCH = -101
+        const val KEYCODE_SHOW_LANGUAGE_PICKER = -102
     }
 }
