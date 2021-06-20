@@ -93,18 +93,18 @@ constructor(
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        binding.emotesView.homeFragmentAdapter.filter.filter(query)
+        this.onQueryTextChange(query)
         binding.emoteSearch.getSearchAutoComplete().clearFocus()
         return false
     }
 
-    // emotesView isn't visible anyways
     override fun onQueryTextChange(newText: String?): Boolean {
+        binding.emotesView.homeFragmentAdapter.filter.filter(newText)
         return false
     }
 
     fun submitQuery() {
-        binding.emoteSearch.setQuery(binding.emoteSearch.query, true)
+//        binding.emoteSearch.setQuery(binding.emoteSearch.query, true)
         showEmotesView()
     }
 
