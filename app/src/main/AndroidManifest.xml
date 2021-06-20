@@ -37,6 +37,17 @@
                 android:resource="@xml/nitrolessime" />
         </service>
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="io.github.transfusion.nitroless.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths" />
+        </provider>
+
+
     </application>
 
 </manifest>

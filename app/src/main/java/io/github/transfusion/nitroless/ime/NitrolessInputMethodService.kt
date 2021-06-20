@@ -1,8 +1,14 @@
 package io.github.transfusion.nitroless.ime
 
+import android.annotation.SuppressLint
+import android.app.AppOpsManager
+import android.content.ClipDescription
+import android.content.Intent
 import android.inputmethodservice.InputMethodService
 import android.inputmethodservice.Keyboard
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener
+import android.net.Uri
+import android.os.Build
 import android.os.IBinder
 import android.text.InputType
 import android.text.TextUtils
@@ -13,11 +19,19 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodSubtype
+import android.webkit.MimeTypeMap
+import androidx.core.content.FileProvider
+import androidx.core.view.inputmethod.EditorInfoCompat
+import androidx.core.view.inputmethod.InputConnectionCompat
+import androidx.core.view.inputmethod.InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION
+import androidx.core.view.inputmethod.InputContentInfoCompat
 import androidx.lifecycle.*
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import com.bumptech.glide.Glide
+import com.chayangkoon.champ.glide.ktx.getOnCoroutine
 import io.github.transfusion.nitroless.BuildConfig
 import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
@@ -26,6 +40,9 @@ import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.ui.home.HomeViewModel
 import io.github.transfusion.nitroless.ui.home.HomeViewModelFactory
 import io.github.transfusion.nitroless.ui.interfaces.EmoteClickedInterface
+import kotlinx.coroutines.launch
+import java.io.File
+import java.net.URI
 
 
 /**
@@ -56,6 +73,7 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
     private lateinit var nitrolessMainKeyboardView: NitrolessMainKeyboardView
 
     private lateinit var emoteSearchInputConnection: InputConnection
+    private lateinit var emoteSearchEditorInfo: EditorInfo
 
 //    private var keyboardDragDelegate: KeyboardDragDelegate? = null
 
@@ -111,6 +129,7 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
      * is displayed, and every time it needs to be re-created such as due to
      * a configuration change.
      */
+    @SuppressLint("RestrictedApi")
     override fun onCreateInputView(): View {
         /*val keyboardParent = layoutInflater.inflate(
             R.layout.input, null
@@ -140,8 +159,12 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
         ViewTreeViewModelStoreOwner.set(nitrolessMainKeyboardView, this)
         ViewTreeSavedStateRegistryOwner.set(nitrolessMainKeyboardView, this)
 
-        emoteSearchInputConnection =
-            CustomInputConnection(nitrolessMainKeyboardView.emoteSearch.getSearchAutoComplete())
+        /*emoteSearchInputConnection =
+            CustomInputConnection(nitrolessMainKeyboardView.emoteSearch.getSearchAutoComplete())*/
+
+        emoteSearchEditorInfo = EditorInfo()
+        emoteSearchInputConnection = nitrolessMainKeyboardView.emoteSearch.getSearchAutoComplete()
+            .onCreateInputConnection(emoteSearchEditorInfo)
 
         homeViewModel.status.observe(owner = this) {
             Log.d(javaClass.name, it.toString())
@@ -164,12 +187,169 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
             }
         }
 
+    private val activeInputEditorInfo: EditorInfo
+        get() {
+            return if (nitrolessMainKeyboardView.emoteSearchFocused) {
+                emoteSearchEditorInfo
+            } else {
+                currentInputEditorInfo
+            }
+        }
+
     fun onEmoteClicked(
         nitrolessRepo: NitrolessRepo,
         path: String,
         emote: NitrolessRepoEmoteModel,
     ) {
-        Log.d(javaClass.name, "ime emote click ${emote.name}")
+        if (BuildConfig.DEBUG)
+            Log.d(javaClass.name, "ime emote click ${emote.name}")
+        // construct the URI
+        var javaURI = URI(nitrolessRepo.url)
+        val newPath =
+            "${javaURI.path}/${path}/${emote.name}${emote.type}"
+        javaURI = javaURI.resolve(newPath)
+//        currentInputConnection.commitText("$javaURI ", 1)
+
+        lifecycleScope.launch {
+            loadAndSendImage(emote, javaURI)
+        }
+    }
+
+    private fun isCommitContentSupported(
+        editorInfo: EditorInfo?, mimeType: String
+    ): Boolean {
+        if (editorInfo == null) {
+            return false
+        }
+        val ic = currentInputConnection ?: return false
+        if (!validatePackageName(editorInfo)) {
+            return false
+        }
+        val supportedMimeTypes: Array<String> = EditorInfoCompat.getContentMimeTypes(editorInfo)
+        for (supportedMimeType in supportedMimeTypes) {
+            if (ClipDescription.compareMimeTypes(mimeType, supportedMimeType)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun validatePackageName(editorInfo: EditorInfo?): Boolean {
+        if (editorInfo == null) {
+            return false
+        }
+        val packageName = editorInfo.packageName ?: return false
+
+        // In Android L MR-1 and prior devices, EditorInfo.packageName is not a reliable identifier
+        // of the target application because:
+        //   1. the system does not verify it [1]
+        //   2. InputMethodManager.startInputInner() had filled EditorInfo.packageName with
+        //      view.getContext().getPackageName() [2]
+        // [1]: https://android.googlesource.com/platform/frameworks/base/+/a0f3ad1b5aabe04d9eb1df8bad34124b826ab641
+        // [2]: https://android.googlesource.com/platform/frameworks/base/+/02df328f0cd12f2af87ca96ecf5819c8a3470dc8
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return true
+        }
+        val inputBinding = currentInputBinding
+        if (inputBinding == null) {
+            // Due to b.android.com/225029, it is possible that getCurrentInputBinding() returns
+            // null even after onStartInputView() is called.
+            // TODO: Come up with a way to work around this bug....
+            Log.e(
+                javaClass.name,
+                "inputBinding should not be null here. "
+                        + "You are likely to be hitting b.android.com/225029"
+            )
+            return false
+        }
+        val packageUid = inputBinding.uid
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            val appOpsManager = getSystemService(APP_OPS_SERVICE) as AppOpsManager
+            try {
+                appOpsManager.checkPackage(packageUid, packageName)
+            } catch (e: java.lang.Exception) {
+                return false
+            }
+            return true
+        }
+        val packageManager = packageManager
+        val possiblePackageNames = packageManager.getPackagesForUid(packageUid)
+        for (possiblePackageName in possiblePackageNames!!) {
+            if (packageName == possiblePackageName) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private suspend fun loadAndSendImage(emote: NitrolessRepoEmoteModel, javaURI: URI) {
+        //        val cr = applicationContext.contentResolver
+        val mime = MimeTypeMap.getSingleton()
+        val type = mime.getMimeTypeFromExtension(emote.type.trim('.'))
+
+        // if the edittext doesn't support image input then just append the url
+        if (type == null || !isCommitContentSupported(currentInputEditorInfo, type)) {
+            currentInputConnection.commitText("$javaURI ", 1)
+            return
+        }
+
+        val file: File =
+            Glide.with(applicationContext).downloadOnly().load("$javaURI").submit().getOnCoroutine()
+
+        // certain apps like whatsapp determine the "file format" through the file extension in the content uri : /
+        val destFile = File(file.path + emote.type)
+        file.copyTo(destFile, true)
+
+        if (BuildConfig.DEBUG)
+            Log.d(javaClass.name, "got cached file loc ${destFile.path}")
+        val contentUri: Uri =
+            FileProvider.getUriForFile(
+                this,
+                "io.github.transfusion.nitroless.fileprovider",
+                destFile,
+                "${emote.name}${emote.type}"
+            )
+        if (BuildConfig.DEBUG)
+            Log.d(javaClass.name, "got cached file contenturi $contentUri")
+
+
+        if (BuildConfig.DEBUG)
+            Log.d(javaClass.name, "got mime type $type")
+
+        val inputContentInfo = InputContentInfoCompat(
+            contentUri,
+            ClipDescription(emote.name, arrayOf(type)),
+            Uri.parse("$javaURI")
+        )
+
+        val flag: Int
+        if (Build.VERSION.SDK_INT >= 25) {
+            flag = INPUT_CONTENT_GRANT_READ_URI_PERMISSION
+        } else {
+            flag = 0
+            try {
+                grantUriPermission(
+                    currentInputEditorInfo.packageName,
+                    contentUri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                Log.e(
+                    TAG,
+                    "grantUriPermission failed packageName=" + currentInputEditorInfo.packageName
+                        .toString() + " contentUri=" + contentUri,
+                    e
+                )
+            }
+        }
+
+        InputConnectionCompat.commitContent(
+            currentInputConnection,
+            currentInputEditorInfo,
+            inputContentInfo,
+            flag,
+            null
+        )
     }
 
     private fun setLatinKeyboard(nextKeyboard: LatinKeyboard?) {
@@ -208,7 +388,7 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
      * This is the main point where we do our initialization of the input method
      * to begin operating on an application.  At this point we have been
      * bound to the client, and are now receiving all of the detailed information
-     * about the target of our edits.co
+     * about the target of our edits.
      */
     override fun onStartInput(attribute: EditorInfo, restarting: Boolean) {
         super.onStartInput(attribute, restarting)
@@ -443,7 +623,7 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
     private fun updateShiftKeyState(attr: EditorInfo?) {
         if (attr != null && mInputView != null && mQwertyKeyboard == mInputView!!.keyboard) {
             var caps = 0
-            val ei = currentInputEditorInfo
+            val ei = activeInputEditorInfo
             if (ei != null && ei.inputType != InputType.TYPE_NULL) {
                 caps = currentInputConnection.getCursorCapsMode(attr.inputType)
             }
@@ -491,7 +671,8 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
         when {
             // should fall through to the isWordSeparator check below if
             // emotesView is not focused
-            primaryCode == LatinKeyboardView.KEYCODE_RETURN && handleReturn() -> {
+            primaryCode == LatinKeyboardView.KEYCODE_RETURN -> {
+                if (!handleReturn()) handleCharacter(primaryCode, keyCodes)
             }
             isWordSeparator(primaryCode) -> {
                 // Handle separator
@@ -499,7 +680,7 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
                     commitTyped(currentInputConnection)
                 }
                 sendKey(primaryCode)
-                updateShiftKeyState(currentInputEditorInfo)
+                updateShiftKeyState(activeInputEditorInfo)
             }
             primaryCode == Keyboard.KEYCODE_DELETE -> {
                 handleBackspace()
@@ -543,7 +724,7 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
         }
         ic.commitText(text, 0)
         ic.endBatchEdit()
-        updateShiftKeyState(currentInputEditorInfo)
+        updateShiftKeyState(activeInputEditorInfo)
     }
 
     private fun handleBackspace() {
@@ -570,7 +751,7 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
             // delete the selection
             activeInputConnection?.commitText("", 1)
         }
-        updateShiftKeyState(currentInputEditorInfo)
+        updateShiftKeyState(activeInputEditorInfo)
     }
 
     private fun handleShift() {
@@ -601,6 +782,7 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
             }
         }
         activeInputConnection?.commitText(primaryCode.toChar().toString(), 1)
+        updateShiftKeyState(activeInputEditorInfo)
     }
 
     private fun handleClose() {
@@ -610,12 +792,25 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
         nitrolessMainKeyboardView.showEmotesView()
     }
 
+    // https://stackoverflow.com/questions/30123882/done-key-on-android-keyboard
     private fun handleReturn(): Boolean {
         if (nitrolessMainKeyboardView.emoteSearchFocused) {
             nitrolessMainKeyboardView.submitQuery()
             return true
+        } else {
+            val ic = currentInputConnection
+            when (activeInputEditorInfo.imeOptions and (EditorInfo.IME_MASK_ACTION or EditorInfo.IME_FLAG_NO_ENTER_ACTION)) {
+                EditorInfo.IME_ACTION_GO -> ic.performEditorAction(EditorInfo.IME_ACTION_GO)
+                EditorInfo.IME_ACTION_NEXT -> ic.performEditorAction(EditorInfo.IME_ACTION_NEXT)
+                EditorInfo.IME_ACTION_SEARCH -> ic.performEditorAction(EditorInfo.IME_ACTION_SEARCH)
+                EditorInfo.IME_ACTION_SEND -> ic.performEditorAction(EditorInfo.IME_ACTION_SEND)
+                else -> {
+//                    ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
+                    return false
+                }
+            }
+            return true
         }
-        return false
     }
 
     private val token: IBinder?

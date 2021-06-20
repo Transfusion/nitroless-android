@@ -15,7 +15,9 @@ import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
 import io.github.transfusion.nitroless.databinding.KeyboardEmotesViewBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
 import io.github.transfusion.nitroless.storage.NitrolessRepo
+import io.github.transfusion.nitroless.storage.RecentlyUsedEmote
 import io.github.transfusion.nitroless.ui.home.*
+import java.util.*
 
 /**
  * Encapsulates everything to do with emojis
@@ -87,14 +89,14 @@ class EmotesView : ConstraintLayout {
 //                    context
                 )
                 // insert into recently used
-                /*val recentlyUsedEmote = RecentlyUsedEmote(
+                val recentlyUsedEmote = RecentlyUsedEmote(
                     repoId = nitrolessRepo.id,
                     emote_path = path,
                     emote_name = emote.name,
                     emote_type = emote.type,
                     emote_used = Date()
                 )
-                homeViewModel.insertRecentlyUsed(recentlyUsedEmote)*/
+                nitrolessInputMethodService.homeViewModel.insertRecentlyUsed(recentlyUsedEmote)
             }
 
         recentlyUsedEmotesAdapter =
@@ -107,14 +109,14 @@ class EmotesView : ConstraintLayout {
 //                    requireContext()
                 )
                 // insert into recently used
-                /*val recentlyUsedEmote = RecentlyUsedEmote(
+                val recentlyUsedEmote = RecentlyUsedEmote(
                     repoId = nitrolessRepo.id,
                     emote_path = path,
                     emote_name = emote.name,
                     emote_type = emote.type,
                     emote_used = Date()
                 )
-                homeViewModel.insertRecentlyUsed(recentlyUsedEmote)*/
+                nitrolessInputMethodService.homeViewModel.insertRecentlyUsed(recentlyUsedEmote)
             }
 
 
