@@ -51,7 +51,7 @@ class BackdropFragment : Fragment() {
             CreditsDataItem(
                 id = i++,
                 name = "Amy",
-                roles = arrayListOf("iOS App", "iOS Keyboard", "macOS App"),
+                roles = arrayListOf("iOS App & Keyboard", "macOS App"),
                 github_username = "elihwyma",
                 twitter_username = "elihwyma"
             )
@@ -63,6 +63,47 @@ class BackdropFragment : Fragment() {
                 roles = arrayListOf("macOS App"),
                 github_username = "althiometer",
                 twitter_username = "a1thio"
+            )
+        )
+
+        l.add(
+            CreditsDataItem(
+                id = i++,
+                name = "Superbro",
+                roles = arrayListOf("iOS App & Keyboard"),
+                github_username = null,
+                twitter_username = "suuperbro"
+            )
+        )
+
+
+        l.add(
+            CreditsDataItem(
+                id = i++,
+                name = "Bypass",
+                roles = arrayListOf("Website"),
+                github_username = "ColeSchaefer",
+                twitter_username = null
+            )
+        )
+
+        l.add(
+            CreditsDataItem(
+                id = i++,
+                name = "Quiprr",
+                roles = arrayListOf("VPS", "API", "Bot"),
+                github_username = "quiprr",
+                twitter_username = "quiprr"
+            )
+        )
+
+        l.add(
+            CreditsDataItem(
+                id = i++,
+                name = "Transfusion",
+                roles = arrayListOf("Android App & Keyboard"),
+                github_username = "Transfusion",
+                twitter_username = "transfusian"
             )
         )
 

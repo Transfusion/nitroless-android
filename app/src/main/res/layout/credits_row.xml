@@ -4,20 +4,31 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="creditsDataItem"
             type="io.github.transfusion.nitroless.ui.home.bottomsheet.CreditsDataItem" />
     </data>
 
-    <LinearLayout style="@style/BottomSheetCard">
+    <androidx.constraintlayout.widget.ConstraintLayout style="@style/BottomSheetCard">
 
         <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/bottomSheetImageView"
             style="@style/BottomSheetImageView"
             android:contentDescription="@{creditsDataItem.name + `'s Avatar`}"
-            app:githubImageUrl="@{`https://github.com/` + creditsDataItem.github_username + `.png`}"
-            app:twitterImageUrl="@{`https://unavatar.now.sh/twitter/` + creditsDataItem.twitter_username}" />
+            app:creditsDataItem="@{creditsDataItem}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout style="@style/BottomSheetSmallCardRightContainer">
+        <LinearLayout
+            android:id="@+id/bottomSheetInfo"
+            style="@style/BottomSheetSmallCardRightContainer"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/bottomSheetImageView"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 style="?attr/textAppearanceHeadline6"
@@ -31,7 +42,41 @@
                 android:layout_marginTop="@dimen/cat_card_single_spacing"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="@{String.join(`   `, creditsDataItem.roles)}" />
+                android:text="@{String.join(` | `, creditsDataItem.roles)}" />
         </LinearLayout>
-    </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/github_link_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="@{creditsDataItem.github_username == null ? View.GONE : View.VISIBLE}"
+                app:srcCompat="@drawable/ic_vector_github" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/twitter_link_btn"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="@{creditsDataItem.twitter_username == null ? View.GONE : View.VISIBLE}"
+                app:srcCompat="@drawable/icon_twitter" />
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
