@@ -40,11 +40,14 @@ android {
 }
 
 dependencies {
+    compileOnly 'com.github.pengrad:jdk9-deps:1.0'
     def latestFastAdapterRelease = "5.4.1"
-    implementation "com.mikepenz:fastadapter-extensions-binding:${latestFastAdapterRelease}" // view binding helpers
+    implementation "com.mikepenz:fastadapter-extensions-binding:${latestFastAdapterRelease}"
+    // view binding helpers
     implementation "com.mikepenz:fastadapter:${latestFastAdapterRelease}"
     implementation "com.mikepenz:fastadapter-extensions-expandable:${latestFastAdapterRelease}"
-    implementation "com.mikepenz:fastadapter-extensions-utils:${latestFastAdapterRelease}" // needs the `expandable`, `drag` and `scroll` extension.
+    implementation "com.mikepenz:fastadapter-extensions-utils:${latestFastAdapterRelease}"
+    // needs the `expandable`, `drag` and `scroll` extension.
     // For animated GIF support
     implementation 'com.facebook.fresco:animated-gif:2.4.0'
 

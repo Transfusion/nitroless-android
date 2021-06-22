@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="creditsDataItem"
+            type="io.github.transfusion.nitroless.ui.home.bottomsheet.CreditsDataItem" />
+    </data>
+
+    <LinearLayout style="@style/BottomSheetCard">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            style="@style/BottomSheetImageView"
+            android:contentDescription="@{creditsDataItem.name + `'s Avatar`}"
+            app:githubImageUrl="@{`https://github.com/` + creditsDataItem.github_username + `.png`}"
+            app:twitterImageUrl="@{`https://unavatar.now.sh/twitter/` + creditsDataItem.twitter_username}" />
+
+        <LinearLayout style="@style/BottomSheetSmallCardRightContainer">
+
+            <TextView
+                style="?attr/textAppearanceHeadline6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{creditsDataItem.name}" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/cat_card_single_spacing"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@{String.join(`   `, creditsDataItem.roles)}" />
+        </LinearLayout>
+    </LinearLayout>
+</layout>

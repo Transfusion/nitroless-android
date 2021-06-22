@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Nitroless</string>
     <string name="title_home">Nitroless</string>
+    <string name="home_info_btn_text">Info and Settings</string>
+    
     <string name="title_sources">Sources</string>
     <string name="title_notifications">Notifications</string>
 
@@ -25,5 +27,5 @@
     <!-- Symbols that are commonly considered word separators in this language -->
     <string name="word_separators">\u0020.,;:!?\n()[]*&amp;@{}/&lt;&gt;_+=|&quot;</string>
 
-    
+
 </resources>
