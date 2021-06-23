@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.preference:preference:1.1.1'
     compileOnly 'com.github.pengrad:jdk9-deps:1.0'
     def latestFastAdapterRelease = "5.4.1"
     implementation "com.mikepenz:fastadapter-extensions-binding:${latestFastAdapterRelease}"

@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import io.github.transfusion.nitroless.adapters.CreditsAdapter
 import io.github.transfusion.nitroless.databinding.BackdropFragmentBinding
+import io.github.transfusion.nitroless.ui.home.HomeFragmentDirections
 
 
 class BackdropFragment : Fragment() {
@@ -23,6 +25,10 @@ class BackdropFragment : Fragment() {
         val creditsAdapter = CreditsAdapter()
         subscribeCreditsAdapter(creditsAdapter)
 
+        binding.settingsBtn.setOnClickListener {
+            val navDirection = HomeFragmentDirections.actionNavigationHomeToNavigationSettings()
+            findNavController().navigate(navDirection)
+        }
         return root
     }
 

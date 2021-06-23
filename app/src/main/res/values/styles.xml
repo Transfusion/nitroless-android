@@ -37,7 +37,10 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:paddingHorizontal">@dimen/cat_card_double_spacing</item>
+
+        <item name="android:paddingStart">@dimen/cat_card_double_spacing</item>
+        <item name="android:paddingEnd">@dimen/cat_card_double_spacing</item>
+        <item name="android:paddingTop">@dimen/cat_card_single_spacing</item>
         <item name="android:paddingBottom">@dimen/cat_card_single_spacing</item>
     </style>
 
@@ -68,8 +71,16 @@
     <style name="BottomSheetCard">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingHorizontal">@dimen/cat_card_double_spacing</item>
+        <item name="android:paddingStart">@dimen/cat_card_double_spacing</item>
+        <item name="android:paddingEnd">@dimen/cat_card_double_spacing</item>
         <item name="android:paddingBottom">@dimen/cat_card_single_spacing</item>
     </style>
+
+
+    <!--settings screen-->
+    <style name="Theme.Nitroless.PreferenceThemeOverlay" parent="PreferenceThemeOverlay">
+        <item name="android:layout">@layout/fragment_settings</item>
+    </style>
+
 
 </resources>

@@ -102,7 +102,6 @@
             android:name="io.github.transfusion.nitroless.ui.home.bottomsheet.BackdropFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize"
             app:behavior_hideable="true"
             app:behavior_peekHeight="0dp"
             app:behavior_skipCollapsed="true"

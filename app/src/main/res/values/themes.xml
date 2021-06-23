@@ -15,5 +15,8 @@
         <item name="searchViewBackgroundColor">@color/cardview_light_background</item>
         <item name="bottomSheetBackgroundColor">@color/cardview_light_background</item>
         <item name="snackbarStyle">@style/Widget.MaterialComponents.Snackbar</item>
+
+        <!--        custom settings setting layout -->
+        <item name="preferenceTheme">@style/Theme.Nitroless.PreferenceThemeOverlay</item>
     </style>
 </resources>
