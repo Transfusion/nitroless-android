@@ -1,9 +1,12 @@
 package io.github.transfusion.nitroless.ui.home.bottomsheet
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import io.github.transfusion.nitroless.adapters.CreditsAdapter
@@ -25,11 +28,29 @@ class BackdropFragment : Fragment() {
         val creditsAdapter = CreditsAdapter()
         subscribeCreditsAdapter(creditsAdapter)
 
+        binding.websiteBtn.setOnClickListener {
+            openUrl("https://nitroless.github.io")
+        }
+
+        binding.discordBtn.setOnClickListener {
+            openUrl("https://discord.com/invite/2h88T99sPa")
+        }
+
+        binding.nitrolessGithubBtn.setOnClickListener {
+            openUrl("https://github.com/Nitroless/")
+        }
+
         binding.settingsBtn.setOnClickListener {
             val navDirection = HomeFragmentDirections.actionNavigationHomeToNavigationSettings()
             findNavController().navigate(navDirection)
         }
         return root
+    }
+
+    private fun openUrl(url: String) {
+        val i = Intent(Intent.ACTION_VIEW)
+        i.data = Uri.parse(url)
+        ContextCompat.startActivity(requireContext(), i, null)
     }
 
     private fun subscribeCreditsAdapter(creditsAdapter: CreditsAdapter) {
@@ -115,5 +136,11 @@ class BackdropFragment : Fragment() {
 
         creditsAdapter.submitList(l)
         binding.creditsRecyclerView.adapter = creditsAdapter
+    }
+
+    fun setOnCloseListener(function: () -> Unit) {
+        binding.closeBtn.setOnClickListener {
+            function()
+        }
     }
 }

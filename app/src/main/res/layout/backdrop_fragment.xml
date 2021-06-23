@@ -46,7 +46,10 @@
                 android:orientation="vertical">
 
                 <!--  visit the website -->
-                <LinearLayout style="@style/BottomSheetSmallCard">
+                <LinearLayout
+                    android:id="@+id/website_btn"
+                    style="@style/BottomSheetSmallCard"
+                    android:background="?attr/selectableItemBackground">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         style="@style/BottomSheetSmallImageView"
@@ -73,7 +76,10 @@
 
 
                 <!--join the discord-->
-                <LinearLayout style="@style/BottomSheetSmallCard">
+                <LinearLayout
+                    android:id="@+id/discord_btn"
+                    style="@style/BottomSheetSmallCard"
+                    android:background="?attr/selectableItemBackground">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         style="@style/BottomSheetSmallImageView"
@@ -91,7 +97,10 @@
                 </LinearLayout>
 
 
-                <LinearLayout style="@style/BottomSheetSmallCard">
+                <LinearLayout
+                    android:id="@+id/nitroless_github_btn"
+                    style="@style/BottomSheetSmallCard"
+                    android:background="?attr/selectableItemBackground">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         style="@style/BottomSheetSmallImageView"

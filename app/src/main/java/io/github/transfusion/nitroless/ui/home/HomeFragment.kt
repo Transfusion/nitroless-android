@@ -91,6 +91,10 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
             mBottomSheetBehavior = bsb
         }
 
+        infoBottomSheet.setOnCloseListener {
+            mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.action_show_info -> {
