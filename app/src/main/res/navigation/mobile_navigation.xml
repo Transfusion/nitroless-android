@@ -45,7 +45,7 @@
 
     <fragment
         android:id="@+id/navigation_settings"
-        android:name="io.github.transfusion.nitroless.SettingsFragment"
+        android:name="io.github.transfusion.nitroless.ui.settings.SettingsFragment"
         android:label="Settings">
 
     </fragment>

@@ -17,4 +17,9 @@ class RecentlyUsedEmoteRepository(private val recentlyUsedEmoteDao: RecentlyUsed
         // now truncate
         recentlyUsedEmoteDao.deleteEntriesOutsideLastN(Constants.RECENTLY_USED_MAX)
     }
+
+    @WorkerThread
+    fun deleteAll() {
+        recentlyUsedEmoteDao.deleteAll()
+    }
 }

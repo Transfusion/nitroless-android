@@ -23,4 +23,7 @@ interface RecentlyUsedEmoteDao {
 
     @Query("DELETE FROM recentlyusedemote WHERE emote_id NOT IN (SELECT emote_id from recentlyusedemote ORDER BY emote_used DESC LIMIT :n)")
     fun deleteEntriesOutsideLastN(n: Int): Int
+
+    @Query("DELETE FROM recentlyusedemote")
+    fun deleteAll()
 }
