@@ -21,6 +21,11 @@
         android:summary="Clears all the recently used emotes"
         android:title="Reset recently used" />
 
+    <Preference
+        android:key="manage_keyboards"
+        android:summary="System keyboard and input settings"
+        android:title="Manage Keyboards" />
+
 
     <!--    </PreferenceCategory>-->
 

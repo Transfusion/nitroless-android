@@ -2,8 +2,8 @@ package io.github.transfusion.nitroless.ui.home
 
 import android.util.Log
 import androidx.lifecycle.*
-import io.github.transfusion.nitroless.enums.LOADINGSTATUS
 import io.github.transfusion.nitroless.data.NitrolessRepoModel
+import io.github.transfusion.nitroless.enums.LOADINGSTATUS
 import io.github.transfusion.nitroless.network.NitrolessRepoEndpoints
 import io.github.transfusion.nitroless.network.ServiceBuilder
 import io.github.transfusion.nitroless.storage.NitrolessRepo
@@ -36,7 +36,7 @@ class HomeViewModel(
     private var _status = MutableLiveData(LOADINGSTATUS.READY)
     val status: LiveData<LOADINGSTATUS> = _status
 
-    //    val repos: LiveData<List<NitrolessRepo>> = repository.repos.asLiveData()
+    val repos: LiveData<List<NitrolessRepo>> = repository.repos.asLiveData()
     private val _nitrolessRepoAndModels: MutableLiveData<List<NitrolessRepoAndModel>> =
         MutableLiveData()
 
@@ -61,9 +61,7 @@ class HomeViewModel(
 
 
     init {
-        viewModelScope.launch {
-            loadNitroLessRepoAndModels()
-        }
+        refresh()
     }
 
     /*private suspend fun loadNitroLessRepoAndModels() {
@@ -83,6 +81,12 @@ class HomeViewModel(
             _status.value = LOADINGSTATUS.FAILED
         }
     }*/
+
+    fun refresh() {
+        viewModelScope.launch {
+            loadNitroLessRepoAndModels()
+        }
+    }
 
     private suspend fun loadNitroLessRepoAndModels() {
         _status.value = LOADINGSTATUS.LOADING

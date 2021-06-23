@@ -18,6 +18,12 @@ interface NitrolessRepoDao {
     @Insert
     suspend fun insertAll(vararg repos: NitrolessRepo)
 
+    /**
+     * To be used only during initial population
+     */
+    @Insert
+    fun insertAllSync(vararg repos: NitrolessRepo)
+
     @Delete
     suspend fun delete(repo: NitrolessRepo)
 }

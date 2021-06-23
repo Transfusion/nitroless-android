@@ -4,11 +4,11 @@
 
     <!-- "Mark Favorite", should appear as action button if possible -->
 
-    <item
-        android:id="@+id/action_sources_refresh"
-        android:icon="@drawable/ic_baseline_refresh_24"
-        android:title="@string/action_sources_refresh"
-        app:showAsAction="always" />
+    <!--    <item
+            android:id="@+id/action_sources_refresh"
+            android:icon="@drawable/ic_baseline_refresh_24"
+            android:title="@string/action_sources_refresh"
+            app:showAsAction="always" />-->
 
     <item
         android:id="@+id/action_add_repo"

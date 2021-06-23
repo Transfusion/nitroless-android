@@ -97,6 +97,9 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
 
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
+                R.id.action_sources_refresh -> {
+                    homeViewModel.refresh()
+                }
                 R.id.action_show_info -> {
                     mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
                 }
@@ -199,6 +202,10 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
         binding.homeRecyclerView.layoutManager = gridLayoutManager
         subscribeHomeFragmentAdapter(homeFragmentAdapter)
         subscribeRecentlyUsedEmotesAdapter(recentlyUsedEmotesAdapter)
+        // upon initial population too
+        homeViewModel.repos.observe(viewLifecycleOwner) {
+            homeViewModel.refresh()
+        }
 
         // bind SearchView
         binding.emoteSearch.setOnQueryTextListener(this)

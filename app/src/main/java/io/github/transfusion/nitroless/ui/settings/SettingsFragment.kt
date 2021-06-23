@@ -1,6 +1,8 @@
 package io.github.transfusion.nitroless.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Gravity
 import android.view.View
 import androidx.appcompat.widget.Toolbar
@@ -59,6 +61,11 @@ class SettingsFragment : PreferenceFragmentCompat(),
                     showResettedSnackbar()
                     true
                 }
+                "manage_keyboards" -> {
+                    val intent = Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)
+                    startActivity(intent)
+                    true
+                }
                 else -> false
             }
         }
@@ -69,7 +76,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         val mySnackbar =
             Snackbar.make(
                 settingsFragmentCoordinatorLayout,
-                "Resetted",
+                "Cleared all recently used emotes.",
                 Snackbar.LENGTH_SHORT
             ).setAction("OK") {
                 // Responds to click on the action
