@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.data.NitrolessRepoEmoteModel
-import io.github.transfusion.nitroless.data.NitrolessRepoModel
 import io.github.transfusion.nitroless.databinding.EmoteCellBinding
 import io.github.transfusion.nitroless.databinding.HomeRecyclerviewSourceHeaderBinding
 import io.github.transfusion.nitroless.databinding.HomeRecyclerviewSourceMessageBinding
@@ -120,11 +119,12 @@ class HomeFragmentAdapter(val onEmoteClicked: (NitrolessRepo, String, NitrolessR
                 }
 
                 withContext(Dispatchers.Main) {
-                    super.submitList(dataItems)
                     currentBackingDataItems = dataItems
                     currentFilteredBackingDataItems = dataItems
-//                    notifyItemRangeChanged(0, list.size)
-                    notifyDataSetChanged()
+                    updateRenderedList()
+//                    submitList(dataItems)
+//                    notifyItemRangeChanged(0, dataItems.size)
+//                    notifyDataSetChanged()
                 }
             }
         }

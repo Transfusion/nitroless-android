@@ -55,7 +55,7 @@ class EmoteCellViewHolder(
             imageUrl: String?
         ) { // This methods should not have any return type, = declaration would make it return that object declaration.
             val uri = URI(baseUrl)
-            val newPath = "${uri.path}/$path/$imageUrl"
+            val newPath = "$uri/$path/$imageUrl"
 //            val newPath = uri.path + '/' + imageUrl
             val newUri = uri.resolve(newPath)
             val url = newUri.normalize().toURL().toString()

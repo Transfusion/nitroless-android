@@ -368,10 +368,10 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
     }
 
     private fun setLatinKeyboard(nextKeyboard: LatinKeyboard?) {
-        val shouldSupportLanguageSwitchKey =
-            mInputMethodManager!!.shouldOfferSwitchingToNextInputMethod(
-                token
-            )
+        val shouldSupportLanguageSwitchKey = true
+        /*mInputMethodManager!!.shouldOfferSwitchingToNextInputMethod(
+            token
+        )*/
         nextKeyboard!!.setLanguageSwitchKeyVisibility(shouldSupportLanguageSwitchKey)
         mInputView!!.keyboard = nextKeyboard
     }
