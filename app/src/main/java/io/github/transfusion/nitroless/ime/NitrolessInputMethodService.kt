@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AppOpsManager
 import android.content.ClipDescription
 import android.content.Intent
+import android.content.SharedPreferences
 import android.inputmethodservice.InputMethodService
 import android.inputmethodservice.Keyboard
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener
@@ -26,6 +27,7 @@ import androidx.core.view.inputmethod.InputConnectionCompat
 import androidx.core.view.inputmethod.InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION
 import androidx.core.view.inputmethod.InputContentInfoCompat
 import androidx.lifecycle.*
+import androidx.preference.PreferenceManager
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
@@ -54,7 +56,7 @@ import java.net.URI
  */
 class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListener,
     ViewModelStoreOwner, LifecycleOwner, LifecycleObserver, SavedStateRegistryOwner,
-    EmoteClickedInterface {
+    EmoteClickedInterface, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var mInputMethodManager: InputMethodManager? = null
     private var mInputView: LatinKeyboardView? = null
@@ -91,10 +93,23 @@ class NitrolessInputMethodService : InputMethodService(), OnKeyboardActionListen
 //        keyboardDragDelegate = KeyboardDragDelegate(this, window.window)
 
         lifecycle.addObserver(this)
+        registerPreferencesChangeCallback()
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == "theme")
+            setInputView(onCreateInputView())
+    }
+
+    private fun registerPreferencesChangeCallback() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.unregisterOnSharedPreferenceChangeListener(this)
         handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     }
 

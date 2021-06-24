@@ -9,9 +9,11 @@ import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.preference.PreferenceManager
 import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.databinding.KeyboardMainBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
+import io.github.transfusion.nitroless.util.createNightModeContext
 
 
 class NitrolessMainKeyboardView @JvmOverloads
@@ -31,7 +33,21 @@ constructor(
 
 
     init {
-        val _ctx = ContextThemeWrapper(nitrolessInputMethodService, R.style.Theme_Nitroless)
+        // get the current preference value
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        val _ctx = when (prefs.getString("theme", "dark")) {
+            "light" -> ContextThemeWrapper(
+                createNightModeContext(context, false),
+                R.style.Theme_Nitroless
+            )
+            "dark" -> ContextThemeWrapper(
+                createNightModeContext(context, true),
+                R.style.Theme_Nitroless
+            )
+            else -> ContextThemeWrapper(context, R.style.Theme_Nitroless)
+        }
+
         _binding =
             DataBindingUtil.inflate(LayoutInflater.from(_ctx), R.layout.keyboard_main, this, true)
 
