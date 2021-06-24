@@ -153,6 +153,10 @@ class EmotesView : ConstraintLayout {
         subscribeHomeFragmentAdapter(nitrolessInputMethodService, homeFragmentAdapter)
         subscribeRecentlyUsedEmotesAdapter(nitrolessInputMethodService, recentlyUsedEmotesAdapter)
         binding.homeRecyclerView.adapter = concatAdapter
+
+        binding.swipeContainer.setOnRefreshListener {
+            nitrolessInputMethodService.homeViewModel.refresh()
+        }
     }
 
     private fun subscribeHomeFragmentAdapter(
