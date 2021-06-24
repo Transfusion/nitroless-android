@@ -53,18 +53,9 @@ class SingleSourceFragment : Fragment(), EmoteClickedInterface,
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        Log.d(javaClass.name, arguments.toString())
-        arguments?.getInt("NitrolessRepoId")?.let {
-            Log.d(javaClass.name, it.toString())
-//            viewModel
-        }
-
         if (savedInstanceState != null) {
             mSearchQuery = savedInstanceState.getString("searchQuery");
         }
-
-
         super.onCreate(savedInstanceState)
     }
 

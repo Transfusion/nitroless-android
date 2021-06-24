@@ -1,7 +1,6 @@
 package io.github.transfusion.nitroless.viewholders
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import androidx.core.view.GestureDetectorCompat
@@ -43,7 +42,6 @@ class NitrolessRepoViewHolder(
 
     init {
         binding.tvRemove.setOnClickListener {
-            Log.d(javaClass.name, "REMOVING JANCOK")
             deleteFunction(binding.repo!!)
         }
 

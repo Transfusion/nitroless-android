@@ -17,7 +17,7 @@ import io.github.transfusion.nitroless.viewholders.EmoteCellViewHolder
 import io.github.transfusion.nitroless.viewholders.HomeRecentlyUsedHeaderViewHolder
 import kotlinx.coroutines.*
 
-class RecentlyUsedEmotesAdapter(val onItemClicked: (NitrolessRepo, String, NitrolessRepoEmoteModel) -> Job) :
+class RecentlyUsedEmotesAdapter(val onItemClicked: (NitrolessRepo, String, NitrolessRepoEmoteModel) -> Unit) :
     ListAdapter<RecentlyUsedDataItem, RecyclerView.ViewHolder>(RecentlyUsedDiffCallback()) {
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)

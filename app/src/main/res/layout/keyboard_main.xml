@@ -17,34 +17,64 @@
 
     <merge tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/emote_search"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/back_and_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-            android:background="@drawable/searchview_background"
-            android:focusedByDefault="false"
-            app:iconifiedByDefault="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:queryBackground="@android:color/transparent"
-            app:queryHint="@string/emote_name" />
+            android:background="?android:attr/windowBackground"
+            android:padding="10dp">
 
-        <!--<TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="kekkakergoaj1234"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />-->
+            <ImageView
+                android:id="@+id/back_btn"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/ic_baseline_arrow_back_24"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <android.inputmethodservice.KeyboardView
+
+            <io.github.transfusion.nitroless.ime.CustomSearchView
+                android:id="@+id/emote_search"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="10dp"
+                android:background="@drawable/searchview_background_ime"
+                android:focusedByDefault="false"
+                app:iconifiedByDefault="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/back_btn"
+                app:layout_constraintTop_toTopOf="parent"
+                app:queryBackground="@android:color/transparent"
+                app:queryHint="@string/emote_name" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <io.github.transfusion.nitroless.ime.LatinKeyboardView
             android:id="@+id/keyboard_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true">
+            android:layout_height="@dimen/keyboard_height"
 
-        </android.inputmethodservice.KeyboardView>
+            android:background="?attr/colorPrimaryDark"
+            android:keyBackground="@drawable/key_background"
+            android:keyPreviewLayout="@layout/preview"
+            android:keyTextColor="#fff"
+
+            app:layout_constraintTop_toBottomOf="@id/back_and_search" />
+
+        <io.github.transfusion.nitroless.ime.EmotesView
+            android:id="@+id/emotesView"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/keyboard_height"
+            android:background="?android:attr/windowBackground"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/back_and_search" />
 
     </merge>
 

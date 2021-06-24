@@ -8,6 +8,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import java.util.*
+import java.util.concurrent.Executors
 
 @Database(
     entities = [NitrolessRepo::class, RecentlyUsedEmote::class],
@@ -60,6 +61,28 @@ abstract class NitrolessRepoDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: NitrolessRepoDatabase? = null
 
+
+        var rdc: Callback = object : Callback() {
+            override fun onCreate(db: SupportSQLiteDatabase) {
+                // do something after database has been created
+                Executors.newSingleThreadExecutor().execute {
+                    INSTANCE?.nitrolessDao()?.insertAllSync(
+                        NitrolessRepo(
+                            name = "Amy's Repo",
+                            url = "https://nitroless.github.io/ExampleNitrolessRepo"
+                        ), NitrolessRepo(
+                            name = "alpha's repo",
+                            url = "https://thealphastream.github.io/emojis"
+                        )
+                    )
+                }
+            }
+
+            override fun onOpen(db: SupportSQLiteDatabase) {
+                // do something every time database is open
+            }
+        }
+
         fun getDatabase(context: Context): NitrolessRepoDatabase {
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
@@ -68,7 +91,8 @@ abstract class NitrolessRepoDatabase : RoomDatabase() {
                     context.applicationContext,
                     NitrolessRepoDatabase::class.java,
                     "nitroless"
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
+                ).addCallback(rdc).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .build()
                 INSTANCE = instance
                 // return instance
                 instance

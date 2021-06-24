@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--    setting  android:layout_marginTop="?attr/actionBarSize" on the fragment is buggy - the collapsingtoolbarlayout messes with it -->
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="@drawable/backdrop_fragment_background"
+        android:clickable="true"
+        android:elevation="25dp"
+        android:focusable="true">
+
+        <!--<TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Backdrop Content"
+            android:textSize="32dp" />-->
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/close_btn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="@dimen/cat_card_double_spacing"
+            android:contentDescription="Close"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_close_black" />
+
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/close_btn">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!--  visit the website -->
+                <LinearLayout
+                    android:id="@+id/website_btn"
+                    style="@style/BottomSheetSmallCard"
+                    android:background="?attr/selectableItemBackground">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        style="@style/BottomSheetSmallImageView"
+                        android:contentDescription="Nitroless Logo"
+                        app:srcCompat="@mipmap/ic_launcher" />
+
+                    <LinearLayout style="@style/BottomSheetSmallCardRightContainer">
+
+                        <TextView
+                            style="?attr/textAppearanceSubtitle1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Visit the website" />
+
+                        <!--<TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/cat_card_single_spacing"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="Sample long secondary line text" />-->
+                    </LinearLayout>
+                </LinearLayout>
+
+
+                <!--join the discord-->
+                <LinearLayout
+                    android:id="@+id/discord_btn"
+                    style="@style/BottomSheetSmallCard"
+                    android:background="?attr/selectableItemBackground">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        style="@style/BottomSheetSmallImageView"
+                        android:contentDescription="Discord Logo"
+                        app:srcCompat="@drawable/discord_logo" />
+
+                    <LinearLayout style="@style/BottomSheetSmallCardRightContainer">
+
+                        <TextView
+                            style="?attr/textAppearanceSubtitle1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Join the Discord" />
+                    </LinearLayout>
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/nitroless_github_btn"
+                    style="@style/BottomSheetSmallCard"
+                    android:background="?attr/selectableItemBackground">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        style="@style/BottomSheetSmallImageView"
+                        android:contentDescription="GitHub Logo"
+                        app:srcCompat="@drawable/github_logo" />
+
+                    <LinearLayout style="@style/BottomSheetSmallCardRightContainer">
+
+                        <TextView
+                            style="?attr/textAppearanceSubtitle1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="View on GitHub" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!--            go to settings screen-->
+
+                <LinearLayout
+                    android:id="@+id/settings_btn"
+                    style="@style/BottomSheetSmallCard"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        style="@style/BottomSheetSmallImageView"
+                        android:contentDescription="Settings"
+                        app:srcCompat="@drawable/ic_baseline_settings_24" />
+
+                    <LinearLayout style="@style/BottomSheetSmallCardRightContainer">
+
+                        <TextView
+                            style="?attr/textAppearanceSubtitle1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Settings" />
+                    </LinearLayout>
+                </LinearLayout>
+
+
+                <View style="@style/Divider" />
+
+                <!--credits begin here-->
+                <!-- wrap_content is intentional - not that many folks, so disable view recycling -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/credits_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="LinearLayoutManager"
+                    tools:listitem="@layout/credits_row" />
+
+
+            </LinearLayout>
+
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

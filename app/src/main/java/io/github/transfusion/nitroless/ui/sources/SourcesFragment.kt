@@ -1,8 +1,5 @@
 package io.github.transfusion.nitroless.ui.sources
 
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-
 import android.app.Activity
 import android.content.ClipboardManager
 import android.content.Intent
@@ -13,30 +10,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.URLUtil
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import io.github.transfusion.nitroless.R
-import io.github.transfusion.nitroless.databinding.FragmentSourcesBinding
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import io.github.transfusion.nitroless.AlertDialogFragment
 import io.github.transfusion.nitroless.NitrolessApplication
+import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.adapters.NitrolessRepoAdapter
 import io.github.transfusion.nitroless.data.NitrolessRepoModel
+import io.github.transfusion.nitroless.databinding.FragmentSourcesBinding
 import io.github.transfusion.nitroless.network.NitrolessRepoEndpoints
 import io.github.transfusion.nitroless.network.ServiceBuilder
 import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.ui.AddNitrolessUrlFragment
-
 import io.github.transfusion.nitroless.ui.YesNoDialogFragment
-import io.github.transfusion.nitroless.viewholders.NitrolessRepoViewHolder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 
 class SourcesFragment : Fragment() {
@@ -90,6 +84,7 @@ class SourcesFragment : Fragment() {
     private fun subscribeNitrolessRepoAdapter(adapter: NitrolessRepoAdapter) {
         sourcesViewModel.repos.observe(viewLifecycleOwner) { repos ->
             Log.d("repos changed", repos.toString())
+            binding.noSourcesMessageVisible = repos.isEmpty()
             adapter.submitList(repos)
         }
         binding.sourcesRecyclerView.adapter = adapter

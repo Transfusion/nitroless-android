@@ -15,7 +15,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
-import io.github.transfusion.nitroless.BuildConfig
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.github.transfusion.nitroless.NitrolessApplication
 import io.github.transfusion.nitroless.R
 import io.github.transfusion.nitroless.adapters.HomeFragmentAdapter
@@ -25,11 +25,14 @@ import io.github.transfusion.nitroless.databinding.FragmentHomeBinding
 import io.github.transfusion.nitroless.enums.LOADINGSTATUS
 import io.github.transfusion.nitroless.storage.NitrolessRepo
 import io.github.transfusion.nitroless.storage.RecentlyUsedEmote
+import io.github.transfusion.nitroless.ui.home.bottomsheet.BackdropFragment
 import io.github.transfusion.nitroless.ui.interfaces.EmoteClickedInterface
 import java.util.*
 
 
 class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextListener {
+
+    private var mBottomSheetBehavior: BottomSheetBehavior<View>? = null
 
     private lateinit var homeFragmentAdapter: HomeFragmentAdapter
 
@@ -65,8 +68,48 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
             ViewModelProvider(this).get(HomeViewModel::class.java)*/
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
 
+        /** start toolbar init **/
+        val navController = findNavController()
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.navigation_home, R.id.navigation_sources
+            )
+        )
+
+        val toolbar = binding.toolbar
+        toolbar.setupWithNavController(navController, appBarConfiguration)
+        toolbar.inflateMenu(R.menu.home_toolbar_menu)
+        /** end toolbar init **/
+
+        /** start init of the draggable bottom sheet **/
+        val infoBottomSheet =
+            childFragmentManager.findFragmentById(R.id.info_bottom_sheet) as BackdropFragment
+        infoBottomSheet.let {
+            val bsb = BottomSheetBehavior.from(it.view as View)
+            bsb.state = BottomSheetBehavior.STATE_HIDDEN
+            mBottomSheetBehavior = bsb
+        }
+
+        infoBottomSheet.setOnCloseListener {
+            mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        toolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_sources_refresh -> {
+                    homeViewModel.refresh()
+                }
+                R.id.action_show_info -> {
+                    mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
+                }
+            }
+            false
+        }
+        /** end bottom sheet init **/
+
+
+        val root: View = binding.root
 //        val textView: TextView = binding.textHome
         /*homeViewModel.text.observe(viewLifecycleOwner, Observer {
             textView.text = it
@@ -159,6 +202,10 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
         binding.homeRecyclerView.layoutManager = gridLayoutManager
         subscribeHomeFragmentAdapter(homeFragmentAdapter)
         subscribeRecentlyUsedEmotesAdapter(recentlyUsedEmotesAdapter)
+        // upon initial population too
+        homeViewModel.repos.observe(viewLifecycleOwner) {
+            homeViewModel.refresh()
+        }
 
         // bind SearchView
         binding.emoteSearch.setOnQueryTextListener(this)
@@ -196,10 +243,10 @@ class HomeFragment : Fragment(), EmoteClickedInterface, SearchView.OnQueryTextLi
         )
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
 
-        homeViewModel.nitrolessRepoAndModels.observe(viewLifecycleOwner) {
+        /*homeViewModel.nitrolessRepoAndModels.observe(viewLifecycleOwner) {
             if (BuildConfig.DEBUG)
                 Log.d(javaClass.name, it.toString())
-        }
+        }*/
     }
 
     private var mSearchQuery: String? = null

@@ -24,4 +24,63 @@
         <item name="cornerSize">5dp</item>
     </style>
 
+    <!--    bottom sheet styles go here -->
+
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">2dp</item>
+        <item name="android:layout_margin">@dimen/cat_card_double_spacing</item>
+        <item name="android:background">?android:attr/listDivider</item>
+    </style>
+
+    <style name="BottomSheetSmallCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+
+        <item name="android:paddingStart">@dimen/cat_card_double_spacing</item>
+        <item name="android:paddingEnd">@dimen/cat_card_double_spacing</item>
+        <item name="android:paddingTop">@dimen/cat_card_single_spacing</item>
+        <item name="android:paddingBottom">@dimen/cat_card_single_spacing</item>
+    </style>
+
+    <style name="BottomSheetSmallCardRightContainer">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">@dimen/cat_card_single_spacing</item>
+        <item name="android:layout_marginLeft">@dimen/cat_card_single_spacing</item>
+        <item name="android:layout_weight">1.0</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="BottomSheetSmallImageView">
+        <item name="android:layout_width">@dimen/bottomsheet_small_image_side</item>
+        <item name="android:layout_height">@dimen/bottomsheet_small_image_side</item>
+        <item name="android:layout_marginEnd">@dimen/cat_card_single_spacing</item>
+        <item name="android:layout_marginRight">@dimen/cat_card_single_spacing</item>
+    </style>
+
+    <style name="BottomSheetImageView">
+        <item name="android:layout_width">@dimen/bottomsheet_image_side</item>
+        <item name="android:layout_height">@dimen/bottomsheet_image_side</item>
+        <item name="android:layout_marginEnd">@dimen/cat_card_single_spacing</item>
+        <item name="android:layout_marginRight">@dimen/cat_card_single_spacing</item>
+    </style>
+
+
+    <style name="BottomSheetCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">@dimen/cat_card_double_spacing</item>
+        <item name="android:paddingEnd">@dimen/cat_card_double_spacing</item>
+        <item name="android:paddingBottom">@dimen/cat_card_single_spacing</item>
+    </style>
+
+
+    <!--settings screen-->
+    <style name="Theme.Nitroless.PreferenceThemeOverlay" parent="PreferenceThemeOverlay">
+        <item name="android:layout">@layout/fragment_settings</item>
+    </style>
+
+
 </resources>
