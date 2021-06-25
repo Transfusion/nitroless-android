@@ -88,6 +88,7 @@ constructor(
         // backBtn MUST be visible if this fun is called
         if (emoteSearchFocused) {
             binding.emoteSearch.getSearchAutoComplete().clearFocus()
+            binding.backAndSearch.requestFocus()
         } else if (binding.emotesView.isVisible) {
             showKeyboardView()
         }
@@ -100,6 +101,7 @@ constructor(
         binding.emotesView.isVisible = true
         binding.keyboardView.isVisible = false
         binding.emoteSearch.getSearchAutoComplete().clearFocus()
+        binding.backAndSearch.requestFocus()
     }
 
     fun showKeyboardView() {
@@ -111,6 +113,7 @@ constructor(
     override fun onQueryTextSubmit(query: String?): Boolean {
         this.onQueryTextChange(query)
         binding.emoteSearch.getSearchAutoComplete().clearFocus()
+        binding.backAndSearch.requestFocus()
         return false
     }
 

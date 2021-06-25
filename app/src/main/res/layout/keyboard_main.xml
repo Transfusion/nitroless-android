@@ -20,6 +20,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/back_and_search"
             android:layout_width="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:layout_height="wrap_content"
             android:background="?android:attr/windowBackground"
             android:padding="10dp">
