@@ -68,6 +68,10 @@ abstract class NitrolessRepoDatabase : RoomDatabase() {
                 Executors.newSingleThreadExecutor().execute {
                     INSTANCE?.nitrolessDao()?.insertAllSync(
                         NitrolessRepo(
+                            name = "Nitroless",
+                            url = "https://nitroless.monotrix.xyz"
+                        ),
+                        NitrolessRepo(
                             name = "Amy's Repo",
                             url = "https://nitroless.github.io/ExampleNitrolessRepo"
                         ), NitrolessRepo(
