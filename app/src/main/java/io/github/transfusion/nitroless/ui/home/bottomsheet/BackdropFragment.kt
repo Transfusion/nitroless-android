@@ -28,7 +28,7 @@ class BackdropFragment : Fragment() {
         val creditsAdapter = CreditsAdapter()
         subscribeCreditsAdapter(creditsAdapter)
 
-        binding.websiteBtn.setOnClickListener {
+        /* binding.websiteBtn.setOnClickListener {
             openUrl("https://nitroless.github.io")
         }
 
@@ -38,7 +38,7 @@ class BackdropFragment : Fragment() {
 
         binding.nitrolessGithubBtn.setOnClickListener {
             openUrl("https://github.com/Nitroless/")
-        }
+        } */
 
         binding.settingsBtn.setOnClickListener {
             val navDirection = HomeFragmentDirections.actionNavigationHomeToNavigationSettings()
@@ -56,7 +56,7 @@ class BackdropFragment : Fragment() {
     private fun subscribeCreditsAdapter(creditsAdapter: CreditsAdapter) {
         var i = 0
         val l = arrayListOf<CreditsDataItem>()
-        l.add(
+        /* l.add(
             CreditsDataItem(
                 id = i++,
                 name = "Alpha_Stream",
@@ -122,7 +122,7 @@ class BackdropFragment : Fragment() {
                 github_username = "quiprr",
                 twitter_username = "quiprr"
             )
-        )
+        ) */
 
         l.add(
             CreditsDataItem(

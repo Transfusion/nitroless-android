@@ -67,7 +67,7 @@ abstract class NitrolessRepoDatabase : RoomDatabase() {
                 // do something after database has been created
                 Executors.newSingleThreadExecutor().execute {
                     INSTANCE?.nitrolessDao()?.insertAllSync(
-                        NitrolessRepo(
+                        /*NitrolessRepo(
                             name = "Nitroless",
                             url = "https://nitroless.monotrix.xyz"
                         ),
@@ -77,6 +77,14 @@ abstract class NitrolessRepoDatabase : RoomDatabase() {
                         ), NitrolessRepo(
                             name = "alpha's repo",
                             url = "https://thealphastream.github.io/emojis"
+                        ),*/
+                        NitrolessRepo(
+                            name = "alpha's repo",
+                            url = "https://transfusion.github.io/nitroless-old-emotes/alpha"
+                        ),
+                        NitrolessRepo(
+                            name = "Medium-sized Repo",
+                            url = "https://transfusion.github.io/nitroless-old-emotes/medium"
                         )
                     )
                 }

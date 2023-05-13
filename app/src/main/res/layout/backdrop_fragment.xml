@@ -46,76 +46,76 @@
                 android:orientation="vertical">
 
                 <!--  visit the website -->
-                <LinearLayout
-                    android:id="@+id/website_btn"
-                    style="@style/BottomSheetSmallCard"
-                    android:background="?attr/selectableItemBackground">
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/website_btn"-->
+<!--                    style="@style/BottomSheetSmallCard"-->
+<!--                    android:background="?attr/selectableItemBackground">-->
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        style="@style/BottomSheetSmallImageView"
-                        android:contentDescription="Nitroless Logo"
-                        app:srcCompat="@mipmap/ic_launcher" />
+<!--                    <androidx.appcompat.widget.AppCompatImageView-->
+<!--                        style="@style/BottomSheetSmallImageView"-->
+<!--                        android:contentDescription="Nitroless Logo"-->
+<!--                        app:srcCompat="@mipmap/ic_launcher" />-->
 
-                    <LinearLayout style="@style/BottomSheetSmallCardRightContainer">
+<!--                    <LinearLayout style="@style/BottomSheetSmallCardRightContainer">-->
 
-                        <TextView
-                            style="?attr/textAppearanceSubtitle1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Visit the website" />
+<!--                        <TextView-->
+<!--                            style="?attr/textAppearanceSubtitle1"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="Visit the website" />-->
 
-                        <!--<TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/cat_card_single_spacing"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:text="Sample long secondary line text" />-->
-                    </LinearLayout>
-                </LinearLayout>
+<!--                        &lt;!&ndash;<TextView-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_marginTop="@dimen/cat_card_single_spacing"-->
+<!--                            android:ellipsize="end"-->
+<!--                            android:maxLines="1"-->
+<!--                            android:text="Sample long secondary line text" />&ndash;&gt;-->
+<!--                    </LinearLayout>-->
+<!--                </LinearLayout>-->
 
 
                 <!--join the discord-->
-                <LinearLayout
-                    android:id="@+id/discord_btn"
-                    style="@style/BottomSheetSmallCard"
-                    android:background="?attr/selectableItemBackground">
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/discord_btn"-->
+<!--                    style="@style/BottomSheetSmallCard"-->
+<!--                    android:background="?attr/selectableItemBackground">-->
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        style="@style/BottomSheetSmallImageView"
-                        android:contentDescription="Discord Logo"
-                        app:srcCompat="@drawable/discord_logo" />
+<!--                    <androidx.appcompat.widget.AppCompatImageView-->
+<!--                        style="@style/BottomSheetSmallImageView"-->
+<!--                        android:contentDescription="Discord Logo"-->
+<!--                        app:srcCompat="@drawable/discord_logo" />-->
 
-                    <LinearLayout style="@style/BottomSheetSmallCardRightContainer">
+<!--                    <LinearLayout style="@style/BottomSheetSmallCardRightContainer">-->
 
-                        <TextView
-                            style="?attr/textAppearanceSubtitle1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Join the Discord" />
-                    </LinearLayout>
-                </LinearLayout>
+<!--                        <TextView-->
+<!--                            style="?attr/textAppearanceSubtitle1"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="Join the Discord" />-->
+<!--                    </LinearLayout>-->
+<!--                </LinearLayout>-->
 
 
-                <LinearLayout
-                    android:id="@+id/nitroless_github_btn"
-                    style="@style/BottomSheetSmallCard"
-                    android:background="?attr/selectableItemBackground">
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/nitroless_github_btn"-->
+<!--                    style="@style/BottomSheetSmallCard"-->
+<!--                    android:background="?attr/selectableItemBackground">-->
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        style="@style/BottomSheetSmallImageView"
-                        android:contentDescription="GitHub Logo"
-                        app:srcCompat="@drawable/github_logo" />
+<!--                    <androidx.appcompat.widget.AppCompatImageView-->
+<!--                        style="@style/BottomSheetSmallImageView"-->
+<!--                        android:contentDescription="GitHub Logo"-->
+<!--                        app:srcCompat="@drawable/github_logo" />-->
 
-                    <LinearLayout style="@style/BottomSheetSmallCardRightContainer">
+<!--                    <LinearLayout style="@style/BottomSheetSmallCardRightContainer">-->
 
-                        <TextView
-                            style="?attr/textAppearanceSubtitle1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="View on GitHub" />
-                    </LinearLayout>
-                </LinearLayout>
+<!--                        <TextView-->
+<!--                            style="?attr/textAppearanceSubtitle1"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="View on GitHub" />-->
+<!--                    </LinearLayout>-->
+<!--                </LinearLayout>-->
 
                 <!--            go to settings screen-->
 
